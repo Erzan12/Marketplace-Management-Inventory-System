@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { RESPONSE_MESSAGES } from 'src/common/constants/response-messages.constant';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { RESPONSE_MESSAGES } from '../common/constants/response-messages.constant';
 
 @Injectable()
 export class AuthService {

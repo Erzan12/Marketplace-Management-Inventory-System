@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Roles } from '../auth/public.decorator';
+import { Roles } from '../common/decorators/public.decorator';
 // import { Role } from '../auth/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { RolesGuard } from '../common/guard/roles.guard';
 
 // @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'), RolesGuard)

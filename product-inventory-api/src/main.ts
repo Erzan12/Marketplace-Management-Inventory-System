@@ -1,6 +1,8 @@
+require("dotenv").config();
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+
 // import { FakeAuthMiddleware } from './auth/fake-auth.middleware';
 
 async function bootstrap() {

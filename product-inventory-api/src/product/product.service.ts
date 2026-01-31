@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus, BadRequestException  } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { RESPONSE_MESSAGES } from 'src/common/constants/response-messages.constant';
-import { buildErrorResponse } from 'src/common/helpers/response-helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { buildErrorResponse } from '../common/helpers/response-helper';
+import { RESPONSE_MESSAGES } from '../common/constants/response-messages.constant';
 
 @Injectable()
 export class ProductService {

@@ -17,6 +17,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
+import { UserService } from './user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [ 
@@ -30,7 +32,7 @@ import { UserModule } from './user/user.module';
             ConfigModule.forRoot({isGlobal: true, // makes config available everywhere
             }), InvoiceModule, MailModule, AnalyticsModule, UserModule
           ],
-  providers: [PrismaService, InvoiceService, MailService, AnalyticsService],
+  providers: [PrismaService, InvoiceService, MailService, AnalyticsService, UserService, JwtService],
   controllers: [AnalyticsController, UserController],
 })
 export class AppModule {}

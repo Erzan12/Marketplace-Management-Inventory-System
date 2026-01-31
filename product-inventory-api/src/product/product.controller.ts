@@ -3,7 +3,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { RestockProductDto } from './dto/restock-product.dto';
-import { Authenticated, Roles } from '../auth/public.decorator';
+import { Authenticated, Roles } from '../common/decorators/public.decorator';
 // import { Role } from '../auth/role.enum';
 
 // -- disabled jwt for testing in frontend will be comment out later

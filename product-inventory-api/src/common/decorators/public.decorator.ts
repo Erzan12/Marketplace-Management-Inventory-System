@@ -1,8 +1,7 @@
 import { SetMetadata } from "@nestjs/common";
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/auth/roles.guard';
-
+import { RolesGuard } from "../guard/roles.guard";
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles); // dry guardlogic for roles
 

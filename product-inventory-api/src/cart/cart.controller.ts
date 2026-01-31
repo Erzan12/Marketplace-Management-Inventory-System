@@ -1,6 +1,6 @@
 import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
-import { Authenticated } from 'src/auth/public.decorator';
+import { Authenticated } from '../common/decorators/public.decorator';
 
 // -- disabled jwt for testing in frontend will be comment out later
 @Controller('api/orders')

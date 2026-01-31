@@ -2,12 +2,12 @@
 import { Controller, Post, Body, Request, Patch, Param, Get, Req, ParseIntPipe, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { Roles } from '../auth/public.decorator';
+import { Roles } from '../common/decorators/public.decorator';
 // import { Role } from '../auth/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/auth/roles.guard';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { RolesGuard } from '../common/guard/roles.guard';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('api/orders')

@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { RESPONSE_MESSAGES } from "src/common/constants/response-messages.constant";
-import { successResponse } from "src/common/helpers/response-helper";
+import { RESPONSE_MESSAGES } from "../common/constants/response-messages.constant";
+import { successResponse } from "../common/helpers/response-helper";
 
 @Injectable()
 export class CartService {

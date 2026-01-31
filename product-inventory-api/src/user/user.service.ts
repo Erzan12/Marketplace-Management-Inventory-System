@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { RESPONSE_MESSAGES } from 'src/common/constants/response-messages.constant';
-import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { RESPONSE_MESSAGES } from '../common/constants/response-messages.constant';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UserService {
@@ -15,8 +15,8 @@ export class UserService {
         const allowedRoles = ['user', 'admin']; //whitelist roles
         const userRole = role ?? 'user'; // fallback to user if undefined
 
-        if (!allowedRoles.includes(role)) {
-            throw 
-        }
+        // if (!allowedRoles.includes(role)) {
+        //     throw 
+        // }
     }
 }
