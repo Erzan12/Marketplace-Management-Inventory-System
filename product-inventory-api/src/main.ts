@@ -14,6 +14,7 @@ async function bootstrap() {
     .setVersion('V1.0.0')
     .addBearerAuth()
     .addTag('Auth', 'Endpoint for user authentication')
+    .addTag('Administrator', 'Manage and maintain the system')
     .addTag('User', 'User profile and dashboard')
     .addTag('Cart', 'User orders cart')
     .addTag('Order', 'User purchases')
