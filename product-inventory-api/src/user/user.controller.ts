@@ -8,8 +8,4 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class UserController {
     constructor(private user: UserService) {}
 
-    @Post('register')
-    register(@Body() body: CreateUserDto) {
-        return this.user.register(body.email, body.password, body.role);
-    }
 }

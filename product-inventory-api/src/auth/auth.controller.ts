@@ -1,14 +1,22 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { Authenticated, Public } from '../common/decorators/public.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LogInDto } from './dto/log-in.dto';
 
-@ApiBearerAuth()
+@Authenticated()
 @Controller('auth')
 export class AuthController {
     constructor(private auth: AuthService) {}
 
+    @Public()
     @Post('login')
-    login(@Body() body: { email: string; password: string}) {
-        return this.auth.login(body.email, body.password);
+    login(@Body() dto: LogInDto) {
+        return this.auth.login(dto);
+    }
+
+    @Post('register')
+    register(@Body() dto: CreateUserDto) {
+        return this.auth.register(dto);
     }
 }

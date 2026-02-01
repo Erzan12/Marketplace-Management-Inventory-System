@@ -12,14 +12,43 @@ datasource db {
   provider = "postgresql"
 }
 
+enum OrderStatus {
+  pending
+  paid
+  shipped
+  completed
+  cancelled
+}
+
+enum Role {
+  user
+  admin
+}
+
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  password  String
-  role      String     @default("user")
-  orders    Order[]
-  createdAt DateTime   @default(now())
-  CartItem  CartItem[]
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  password    String
+  role        Role         @default(user)
+  orders      Order[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  CartItem    CartItem[]
+  userProfile UserProfile?
+}
+
+model UserProfile {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @unique
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName  String?
+  lastName   String?
+  avatarURL  String?
+  bio        String?
+  phone      String?
+  dateOfBirt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Category {
@@ -36,26 +65,18 @@ model Product {
   description String?
   price       Float
   quantity    Int
-  categoryId  Int
-  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   orderItems  OrderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   CartItem    CartItem[]
 }
 
-enum OrderStatus {
-  pending
-  paid
-  shipped
-  completed
-  cancelled
-}
-
 model Order {
   id        Int         @id @default(autoincrement())
   userId    Int
-  user      User        @relation(fields: [userId], references: [id])
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     OrderItem[]
   status    String      @default("pending") // or enum later
   total     Float       @default(0)
@@ -65,9 +86,9 @@ model Order {
 model OrderItem {
   id        Int     @id @default(autoincrement())
   orderId   Int
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int
   price     Float
 }
@@ -77,8 +98,8 @@ model CartItem {
   userId    Int
   productId Int
   quantity  Int
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -86,8 +107,8 @@ model CartItem {
 }
 
 model InventorySnapshot {
-  id          Int       @id @default(autoincrement())
-  month       String    @unique // e.g "2025-05"
-  totalValue  Float
-  createdAt   DateTime  @default(now())
+  id         Int      @id @default(autoincrement())
+  month      String   @unique // e.g "2025-05"
+  totalValue Float
+  createdAt  DateTime @default(now())
 }
