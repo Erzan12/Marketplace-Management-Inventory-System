@@ -8,9 +8,11 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { RolesGuard } from '../common/guard/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-@UseGuards(AuthGuard('jwt'), RolesGuard)
-@Controller('api/orders')
+@ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

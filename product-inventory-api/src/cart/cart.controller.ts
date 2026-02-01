@@ -1,9 +1,11 @@
 import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
 import { Authenticated } from '../common/decorators/public.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 // -- disabled jwt for testing in frontend will be comment out later
-@Controller('api/orders')
+@ApiBearerAuth()
+@Controller('orders')
 export class CartController {
     constructor ( private readonly cartService: CartService) {}
 

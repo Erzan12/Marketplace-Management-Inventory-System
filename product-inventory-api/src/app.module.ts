@@ -19,6 +19,8 @@ import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/guard/roles.guard';
 
 @Module({
   imports: [ 
@@ -32,7 +34,12 @@ import { JwtService } from '@nestjs/jwt';
             ConfigModule.forRoot({isGlobal: true, // makes config available everywhere
             }), InvoiceModule, MailModule, AnalyticsModule, UserModule
           ],
-  providers: [PrismaService, InvoiceService, MailService, AnalyticsService, UserService, JwtService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    },
+    PrismaService, InvoiceService, MailService, AnalyticsService, UserService, JwtService],
   controllers: [AnalyticsController, UserController],
 })
 export class AppModule {}

@@ -1,8 +1,10 @@
 import { Controller, Get, Param, ParseIntPipe, Res } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { Response } from 'express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-@Controller('api/invoice')
+@ApiBearerAuth()
+@Controller('invoice')
 export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}
 

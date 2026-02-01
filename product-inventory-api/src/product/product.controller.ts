@@ -4,10 +4,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { RestockProductDto } from './dto/restock-product.dto';
 import { Authenticated, Roles } from '../common/decorators/public.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 // import { Role } from '../auth/role.enum';
 
 // -- disabled jwt for testing in frontend will be comment out later
-@Controller('api/products')
+@ApiBearerAuth()
+@Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 

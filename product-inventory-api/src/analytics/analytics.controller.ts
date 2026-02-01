@@ -5,8 +5,9 @@ import { Roles } from '../common/decorators/public.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guard/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@ApiBearerAuth()
 @Controller('api/analytics')
 export class AnalyticsController {
     constructor( private analyticsService: AnalyticsService) {}

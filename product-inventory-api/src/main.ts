@@ -12,6 +12,7 @@ async function bootstrap() {
     .setTitle('Product Inventory Management System(PIMS)')
     .setDescription('This is the api for PIMS')
     .setVersion('V1.0.0')
+    .addBearerAuth()
     .addTag('Auth', 'Endpoint for user authentication')
     .addTag('User', 'User profile and dashboard')
     .addTag('Cart', 'User orders cart')
@@ -21,6 +22,7 @@ async function bootstrap() {
     .addTag('Category', 'Endpoint for products category')
     .addTag('Analytics', 'Endpoint for sales analytics and operation metrics')
     .build();
+
   const documentFactory =  () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 

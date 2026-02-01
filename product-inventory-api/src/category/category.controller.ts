@@ -7,10 +7,11 @@ import { Roles } from '../common/decorators/public.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guard/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-// @UseGuards(RolesGuard)
-@UseGuards(AuthGuard('jwt'), RolesGuard)
-@Controller('api/categories')
+@ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
