@@ -101,7 +101,7 @@ export class AuthService {
             throw new UnauthorizedException({ message: RESPONSE_MESSAGES.USER.NOT_FOUND });
         }
 
-        const jwt = this.jwt.sign({ sub: user.id, email: user.email});
+        const jwt = this.jwt.sign({ sub: user.id, email: user.email, role: user.role});
         return { 
             access_token: jwt
         };
