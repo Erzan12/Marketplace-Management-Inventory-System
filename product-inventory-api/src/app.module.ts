@@ -22,9 +22,11 @@ import { JwtService } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guard/roles.guard';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { AdministratorModule } from './administrator/administrator.module';
 
 @Module({
   imports: [ 
+            AdministratorModule,
             ProductModule,
             CategoryModule,
             PrismaModule, 
