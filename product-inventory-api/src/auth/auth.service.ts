@@ -43,29 +43,31 @@ export class AuthService {
     // }
 
     async register(dto: CreateUserDto) {
-        // const allowedRoles = ['user', 'admin']; //whitelist roles
-        // const userRole = role ?? 'user'; // fallback to user if undefined
-
         const { email, password } = dto;
 
-        // if (!allowedRoles.includes(role)) {
-        //     throw 
-        // }
+        // Check if user with email already exists
+        const existingUser = await this.prisma.user.findUnique({
+            where: { email },
+        });
 
-        const currentUser = await this.prisma.user.findFirst({
-            where: { role: 'admin' },
-        })
-
-        if(currentUser?.role !== 'admin' || currentUser?.role.length === 0) {
-            throw new BadRequestException('Only administrators are allowed to create user account')
+        if (existingUser) {
+            throw new BadRequestException('User with this email already exists');
         }
 
-        const role = currentUser.role === Role.admin ? dto.role ?? Role.user: Role.user;
+        // Check if this is the first user - make them admin
+        const userCount = await this.prisma.user.count();
+        const isFirstUser = userCount === 0;
+        
+        // If first user, make them admin; otherwise use provided role or default to user
+        const role = isFirstUser ? Role.admin : (dto.role ?? Role.user);
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await this.prisma.user.create({
             data: {
                 email,
-                password,
+                password: hashedPassword,
                 role
             }
         })
@@ -82,14 +84,14 @@ export class AuthService {
 
         return {
             status: 'success',
-            message: 'User has been created successfully',
+            message: isFirstUser 
+                ? 'First user created as administrator'
+                : 'User has been created successfully',
             data: {
                 user
             },
-            created_by: {
-                'user_id': currentUser.id,
-                'role': currentUser.role
-            }
+            is_first_user: isFirstUser,
+            user_role: role
         }
     }
 

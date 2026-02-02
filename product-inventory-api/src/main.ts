@@ -27,9 +27,9 @@ async function bootstrap() {
   const documentFactory =  () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-  // ✅ Enable CORS for frontend on port 3000
+  // ✅ Enable CORS for frontend on ports 3000 and 3001
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
     credentials: true, // Only needed if you use cookies/auth
   });
 
