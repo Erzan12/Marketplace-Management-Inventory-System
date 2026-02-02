@@ -25,10 +25,10 @@ export interface CartItem {
   updatedAt: string; // same as above
 }
 
-// export interface User {
-//   id: number;
-//   email: string;
-//   password:string;
-//   role: string;
-//   createdAt: string;
-// }
+export interface User {
+  id: number;
+  email: string;
+  password:string;
+  role: string;
+  createdAt: string;
+}

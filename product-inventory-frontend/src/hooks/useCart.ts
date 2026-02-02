@@ -6,7 +6,7 @@ export const useCart = () => {
     return useQuery<CartItem[]>({
         queryKey: ['cart'],
         queryFn: async () => {
-            const res = await api.get('http://localhost:3001/api/orders/my-cart');
+            const res = await api.get('/orders/my-cart');
             return res.data;
         }
     })

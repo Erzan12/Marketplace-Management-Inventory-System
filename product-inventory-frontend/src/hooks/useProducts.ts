@@ -6,7 +6,7 @@ export const useProducts = () => {
     return useQuery<Product[]>({
         queryKey: ['products'],
         queryFn: async () => {
-            const response = await api.get('http://localhost:3001/api/products');
+            const response = await api.get('/products');
             return response.data;
         },
     });
