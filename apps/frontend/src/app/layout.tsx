@@ -6,10 +6,14 @@ import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
+import { Inter } from "next/font/google";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body>
         <ReactQueryProvider>
           <Navbar />
