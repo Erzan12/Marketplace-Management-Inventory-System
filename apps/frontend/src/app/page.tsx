@@ -1,4 +1,10 @@
-// pages/index.tsx
+// import { ComponentExample } from "@/components/component-example";
+
+// export default function Page() {
+  
+// return <ComponentExample />;
+// }
+
 'use client';
 
 import Link from 'next/link';
