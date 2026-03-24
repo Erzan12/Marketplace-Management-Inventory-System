@@ -26,7 +26,10 @@
   "private": true,
   "packageManager": "npm@10.5.0",
   "workspaces": [
-      "apps/*",
-      "packages/*"
-    ]
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "framer-motion": "^12.38.0"
+  }
 }
