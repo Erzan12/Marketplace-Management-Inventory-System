@@ -2,7 +2,7 @@
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api-client';
 
 interface ProductCardProps {
   product: Product;

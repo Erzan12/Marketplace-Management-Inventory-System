@@ -5,6 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { RestockProductDto } from './dto/restock-product.dto';
 import { Authenticated, Roles, Public } from '../common/decorators/public.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { GetProductsQueryDto } from './dto/get-product-query.dto';
 
 @ApiBearerAuth()
 @Controller('products')
@@ -22,9 +23,13 @@ export class ProductController {
   // Public - Anyone can view all products
   @Public()
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  async getProducts(@Query() query: GetProductsQueryDto) {
+    return this.productService.findAll(query);
   }
+  // @Get()
+  // findAll() {
+  //   return this.productService.findAll();
+  // }
 
   // Public - Anyone can view a single product
   @Public()

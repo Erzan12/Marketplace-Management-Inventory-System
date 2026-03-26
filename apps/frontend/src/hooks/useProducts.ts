@@ -1,13 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { Product } from "@/types";
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 
-export const useProducts = () => {
-    return useQuery<Product[]>({
-        queryKey: ['products'],
-        queryFn: async () => {
-            const response = await api.get('/api/products');
-            return response.data;
+export interface ProductResponse {
+  data: any[]; // You can define a strict Product interface later based on your Swagger output
+  meta: {
+    totalItems: number;
+    page: number;
+    lastPage: number;
+  };
+}
+
+export function useProducts(params?: { category?: string; search?: string; page?: number }) {
+  return useQuery({
+    queryKey: ['products', params],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ProductResponse>('/products', {
+        params: {
+          category: params?.category,
+          search: params?.search,
+          page: params?.page,
         },
-    });
-};
+      });
+      return data;
+    },
+  });
+}

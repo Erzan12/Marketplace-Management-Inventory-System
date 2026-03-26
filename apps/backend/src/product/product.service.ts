@@ -1,18 +1,45 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus, BadRequestException  } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, BadRequestException, ConflictException  } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { buildErrorResponse } from '../common/helpers/response-helper';
 import { RESPONSE_MESSAGES } from '../common/constants/response-messages.constant';
+import { GetProductsQueryDto } from './dto/get-product-query.dto';
 
 @Injectable()
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  async createProduct(data: CreateProductDto) {
+  async createProduct(dto: CreateProductDto) {
     try {
-      return await this.prisma.product.create({ data });
+      const existingProduct = await this.prisma.product.findFirst({
+        where: { name: dto.name }
+      })
+
+      if (existingProduct) {
+        throw new ConflictException('Product already exist!')
+      }
+
+      const { name, description, price, quantity, categoryId, slug, storeId } = dto;
+
+      const product = await this.prisma.product.create({
+        data: {
+          name,
+          description,
+          price,
+          quantity,
+          categoryId,
+          slug,
+          storeId
+        }
+      })
+
+      return {
+        status: 'success',
+        message: 'Product created successfully',
+        product,
+      }
     } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError && 
@@ -101,20 +128,61 @@ export class ProductService {
     }));
   }
 
-    findAll() {
-    return this.prisma.product.findMany({
-      include: { category: true },
-    });
+  // async findAll() {
+  //   return this.prisma.product.findMany({
+  //     include: { category: true },
+  //   });
+  // }
+  // products.service.ts
+  async findAll(query: GetProductsQueryDto
+  ) {
+    const { search, categoryId, page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    // 2. Build our conditional 'where' query
+    const whereCondition: any = {};
+
+    if (search) {
+      whereCondition.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (categoryId) {
+      whereCondition.categoryId = categoryId;
+    }
+
+    // Execute query and count total for pagination metadata
+    const [products, totalItems] = await Promise.all([
+      this.prisma.product.findMany({
+        where: whereCondition,
+        skip,
+        take: Number(limit),
+        include: { category: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.product.count({ where: whereCondition }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        totalItems,
+        page,
+        lastPage: Math.ceil(totalItems / limit),
+      },
+    };
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return this.prisma.product.findUnique({
       where: { id },
       include: { category: true },
     });
   }
 
-  update(id: number, data: UpdateProductDto) {
+  async update(id: number, data: UpdateProductDto) {
     return this.prisma.product.update({
        where: { id },
        data,

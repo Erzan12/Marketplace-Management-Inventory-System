@@ -19,7 +19,6 @@ export class CreateProductDto {
   description?: string;
 
   @IsInt()
-  @IsNumber()
   @IsPositive()
   @IsNotEmpty()
   @ApiProperty({
@@ -29,7 +28,6 @@ export class CreateProductDto {
   price!: number;
 
   @IsInt()
-  @IsNumber()
   @Min(0)
   @IsNotEmpty()
   @ApiProperty({
@@ -39,11 +37,26 @@ export class CreateProductDto {
   quantity!: number;
 
   @IsInt()
-  @IsNumber()
   @IsNotEmpty()
   @ApiProperty({
     example: 2,
     description: 'The category ID the product belongs'
   })
   categoryId!: number; // required for connect
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'Product slug',
+    description: 'The slug must be unique'
+  })
+  slug!: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'Store ID',
+    description: 'The ID of the store'
+  })
+  storeId!: number;
 }
