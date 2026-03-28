@@ -166,27 +166,42 @@ async function main() {
       slug: 'premium-headphones',
       description: 'Noise-canceling headphones',
       price: 199.99,
-      quantity: 50,
+      // quantity: 50,
       images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e'],
       categoryId: categoryMap.electronics.id,
       storeId: storeMap['tech-haven'].id,
+      inventory: {
+        create: {
+          quantity: rand(10, 150),
+        },
+      },
     },
     {
       name: 'Minimalist Backpack',
       slug: 'minimalist-backpack',
       description: 'Water-resistant backpack',
       price: 89.99,
-      quantity: 100,
+      // quantity: 100,
       images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62'],
       categoryId: categoryMap.fashion.id,
       storeId: storeMap['urban-carry-co'].id,
+      inventory: {
+        create: {
+          quantity: rand(10, 150),
+        },
+      },
     },
   ];
 
   // 💾 INSERT
-  await prisma.product.createMany({
-    data: [...featured, ...products],
-  });
+  // await prisma.product.createMany({
+  //   data: [...featured, ...products],
+  // });
+  await Promise.all(
+    [...featured, ...products].map((product) =>
+      prisma.product.create({ data: product })
+    )
+  );
 
   console.log(`✅ Seeded ${products.length + featured.length} products`);
 }
