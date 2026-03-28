@@ -4,17 +4,26 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Star } from "lucide-react"
 import { getStoreName } from "@/lib/store-name"
-import { useProducts } from "@/hooks/use-shopify"
+// import { useProducts } from "@/hooks/shopify/use-shopify"
 import { useMemo } from "react"
 import Link from "next/link"
+import { useProducts } from "@/hooks/useProducts"
 
 export function Hero() {
   // Get dynamic store name for the hero title
   const storeName = getStoreName()
-  const { products, loading } = useProducts()
+  // const { products, loading } = useProducts()
+  const { data: apiResponse, isLoading, error } = useProducts({
+      // search: debouncedSearch,
+      // category: selectedCollection || undefined,
+      // page: currentPage, // This sends ?page=X to your NestJS API
+    })
+  
 
   // Check if Shopify is configured
   const isShopifyConfigured = !!process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
+
+  const products = apiResponse?.data || []
 
   // Select a random featured product
   const featuredProduct = useMemo(() => {
@@ -27,21 +36,29 @@ export function Hero() {
   const productDetails = useMemo(() => {
     if (!featuredProduct) return null
 
-    const variant = featuredProduct.variants.edges[0]?.node
-    const image = featuredProduct.images.edges[0]?.node
-    const price = variant ? Number.parseFloat(variant.price.amount) : 0
-    const compareAtPrice = featuredProduct.compareAtPriceRange.minVariantPrice.amount
-    const hasDiscount = compareAtPrice && Number.parseFloat(compareAtPrice) > price
+    // 1. Data Mapping for your custom DB (NestJS)
+    // Based on your JSON: { id, name, price, images: [url], slug, quantity }
+    const title = featuredProduct.name
+    const price = featuredProduct.price
+    const image = featuredProduct.images?.[0] // Usually a string array in your DB
+    const handle = featuredProduct.slug
+    const available = featuredProduct.quantity > 0
+
+    // 2. Logic for Discount (If your DB has a compareAtPrice field)
+    // If you haven't added compareAtPrice to your NestJS schema yet, 
+    // hasDiscount will just be false.
+    const compareAtPrice = featuredProduct.compareAtPrice || null 
+    const hasDiscount = !!(compareAtPrice && compareAtPrice > price)
 
     return {
-      title: featuredProduct.title,
+      title,
       price,
-      compareAtPrice: compareAtPrice ? Number.parseFloat(compareAtPrice) : null,
+      compareAtPrice,
       hasDiscount,
-      image: image?.url || "/placeholder.svg?height=400&width=400",
-      imageAlt: image?.altText || featuredProduct.title,
-      handle: featuredProduct.handle,
-      available: variant?.availableForSale || false,
+      image: image || "/placeholder.svg?height=400&width=400",
+      imageAlt: title,
+      handle,
+      available,
     }
   }, [featuredProduct])
 
@@ -104,7 +121,7 @@ export function Hero() {
 
             {/* Right content - show placeholder or real product */}
             <div className="relative">
-              {loading ? (
+              {isLoading ? (
                 // Simplified loading state
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                   <div className="w-full h-80 bg-gray-200 rounded-lg mb-4 animate-pulse"></div>
