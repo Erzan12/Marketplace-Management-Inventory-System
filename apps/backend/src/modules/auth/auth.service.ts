@@ -74,9 +74,9 @@ export class AuthService {
         }
 
         const payload = {
-            userID: user.id,
-            email: user.email,
-            role: user.role
+            id: userValidate.id,
+            email: userValidate.email,
+            role: userValidate.role
         }
 
         const token = this.jwtService.sign(payload, { 
@@ -95,22 +95,26 @@ export class AuthService {
             status: 1,
             message: 'Login successful',
             token,
-            // payload,
+            payload,
         };
     }
 
-    async logout(
-        requestUser: RequestUser
-    ) {
-        await this.prisma.user.update({
-            where: { id: requestUser.id },
+    async logout(requestUser: RequestUser) {
+        try {
+            await this.prisma.user.update({
+            where: { id: requestUser.id }, // make sure this matches your interface
             data: {
-                token_version: {increment: 1},
+                token_version: { increment: 1 },
             },
-        });
+            });
 
-        return {
-            message: 'User log out successfully'
+            return {
+            message: 'User logged out successfully',
+            };
+        } catch (error) {
+            console.error(`User can't logout: ${error}`);
+            // Throw proper HTTP exception so Swagger sees a response
+            throw new BadRequestException('Unable to logout user');
         }
     }
 
