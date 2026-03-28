@@ -31,12 +31,18 @@ model User {
   email       String       @unique
   password    String
   role        Role         @default(CUSTOMER)
-  orders      Order[]
+  token_version  Int       @default(0)
+  is_active   Boolean      @default(true)
+  last_login  DateTime     @default(now())
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  orders      Order[]
+  stores      Store[]
   cartItem    CartItem[]
   userProfile UserProfile?
-  stores      Store[]
+  
 }
 
 model UserProfile {
@@ -57,7 +63,10 @@ model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
   slug      String    @unique
+  is_active   Boolean      @default(true)
+
   products  Product[] // One-to-many relationship
+  
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -70,6 +79,8 @@ model Product {
   categoryId  Int?
   slug        String   @unique
   storeId     Int
+  is_active   Boolean      @default(true)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
