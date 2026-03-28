@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, Store, ExternalLink, ArrowRight, Settings, Copy, Check } from "lucide-react"
 import { useState } from "react"
-import { parseShopifyDomain } from "@/lib/parse-shopify-domain"
+import { parseShopifyDomain } from "@/lib/shopify/parse-shopify-domain"
 
 export function SetupTooltip() {
   const [isOpen, setIsOpen] = useState(true)

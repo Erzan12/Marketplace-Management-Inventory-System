@@ -2,8 +2,8 @@
 
 import { Shirt, Watch, Headphones, Gamepad2, Camera, Coffee, Package, Star } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useCollections } from "@/hooks/use-shopify"
-import { ShopifyCollection } from "@/lib/shopify"
+import { useCollections } from "@/hooks/shopify/use-shopify"
+import { ShopifyCollection } from "@/lib/shopify/shopify"
 
 const defaultIcons = [Shirt, Watch, Headphones, Gamepad2, Camera, Coffee, Package, Star]
 

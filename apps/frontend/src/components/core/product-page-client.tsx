@@ -8,14 +8,14 @@ import { useCart } from "@/contexts/cart-context"
 import { ShoppingCart, Truck, Shield, RotateCcw, ArrowLeft, Loader2 } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
-import { useProduct } from "@/hooks/use-shopify"
+import { useProducts } from "@/hooks/shopify/use-shopify"
 
-interface ProductPageClientProps {
-  productHandle: string
-}
+// interface ProductPageClientProps {
+//   productHandle: string
+// }
 
-export function ProductPageClient({ productHandle }: ProductPageClientProps) {
-  const { product, loading, error } = useProduct(productHandle)
+export function ProductPageClient() {
+  const { product, loading, error } = useProducts()
   const { addItem, state: cartState } = useCart()
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
