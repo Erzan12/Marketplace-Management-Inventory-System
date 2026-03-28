@@ -194,8 +194,15 @@ Feel free to fork the repository and submit a pull request.
 ---
 
 ## 📄 License
+This project is open-source and available under the MIT License.
 
-(Add your license here — e.g., MIT License)
+---
+
+👤 Author
+Erzan
+
+GitHub: https://github.com/Erzan12
+Portfolio: https://erzan-dev.vercel.app/
 
 ---
 
