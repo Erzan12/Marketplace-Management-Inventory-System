@@ -1,7 +1,7 @@
 # 🛒 ShopStack — Marketplace Management and Inventory System
 
 ShopStack is a full-stack **multi-tenant marketplace platform** built with modern web technologies.
-It evolved from a Shopify-based frontend into a fully custom system with complete control over data, business logic, and scalability.
+It evolved from a Shopify-based frontend into a fully custom system with complete control over data, business logic, and scalability. For more information read project docs here: https://erzan-docs.vercel.app/docs/Projects/Inventory-System/development-plan
 
 ---
 
