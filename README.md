@@ -201,8 +201,8 @@ This project is open-source and available under the MIT License.
 👤 Author
 Erzan
 
-GitHub: https://github.com/Erzan12
-Portfolio: https://erzan-dev.vercel.app/
+- GitHub: https://github.com/Erzan12
+- Portfolio: https://erzan-dev.vercel.app/
 
 ---
 
