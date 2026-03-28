@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Request, Patch, Param, Get, Req, ParseIntPipe, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto } from './dto/order.dto';
 import { Authenticated, Roles, Public } from '../common/decorators/public.decorator';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';

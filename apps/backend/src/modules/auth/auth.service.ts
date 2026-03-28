@@ -1,46 +1,20 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { RESPONSE_MESSAGES } from '../common/constants/response-messages.constant';
 import { Role } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LogInDto } from './dto/log-in.dto';
+import { PrismaService } from '../../prisma/prisma.service';
+import { RESPONSE_MESSAGES } from '../../common/constants/response-messages.constant';
+import { RequestUser } from '../../shared/types/request-user.interface';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
-        private jwt: JwtService,
+        private jwtService: JwtService,
     ) {}
-
-    // async register(email: string, password: string, role: string = 'user') {
-    //     const allowedRoles = ['user', 'admin'];
-    //     const userRole = role ?? 'user';
-
-    //     if (!allowedRoles.includes(userRole)) {
-    //         throw new BadRequestException('Invalid role');
-    //     }
-
-    //     const existingUser = await this.prisma.user.findUnique({ where: { email } });
-    //     if (existingUser) {
-    //         throw new BadRequestException('User with this email already exists');
-    //     }
-
-    //     const hashedPassword = await bcrypt.hash(password, 10);
-    //     const user = await this.prisma.user.create({
-    //         data: {
-    //             email,
-    //             password: hashedPassword,
-    //             role: userRole as Role,
-    //         },
-    //     });
-        
-    //     return { 
-    //         message: RESPONSE_MESSAGES.USER.CREATED, 
-    //         userId: user.id
-    //     };
-    // }
 
     async register(dto: CreateUserDto) {
         const { email, password } = dto;
@@ -59,7 +33,7 @@ export class AuthService {
         const isFirstUser = userCount === 0;
         
         // If first user, make them admin; otherwise use provided role or default to user
-        const role = isFirstUser ? Role.admin : (dto.role ?? Role.user);
+        const role = isFirstUser ? Role.ADMIN :  Role.CUSTOMER;
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -68,25 +42,15 @@ export class AuthService {
             data: {
                 email,
                 password: hashedPassword,
-                role
+                role,
             }
         })
-
-        // let requestUser;
-    
-        // if (user.role === 'admin') {
-        //     requestUser = user;
-        // } else {
-        //     requestUser = await this.prisma.user.findUnique({
-        //         where: { id: user.id }
-        //     })
-        // }
 
         return {
             status: 'success',
             message: isFirstUser 
                 ? 'First user created as administrator'
-                : 'User has been created successfully',
+                : 'User(customer account) has been created successfully',
             data: {
                 user
             },
@@ -103,13 +67,76 @@ export class AuthService {
             throw new UnauthorizedException({ message: RESPONSE_MESSAGES.USER.NOT_FOUND });
         }
 
-        const jwt = this.jwt.sign({ sub: user.id, email: user.email, role: user.role});
-        return { 
-            access_token: jwt
+        const userValidate = await this.validateUser(email, password);
+
+        if (userValidate.is_active !== true) {
+            throw new BadRequestException ('Your account was deactivated')
+        }
+
+        const payload = {
+            userID: user.id,
+            email: user.email,
+            role: user.role
+        }
+
+        const token = this.jwtService.sign(payload, { 
+            secret: process.env.JWT_SECRET,
+            expiresIn: '8h'
+        });
+
+        await this.prisma.user.update({
+            where: { id: user.id},
+            data: {
+                last_login: new Date()
+            }
+        });
+
+        return {
+            status: 1,
+            message: 'Login successful',
+            token,
+            // payload,
         };
     }
 
-    async validateUser(userId: number) {
-        return this.prisma.user.findUnique({ where: { id: userId} });
+    async logout(
+        requestUser: RequestUser
+    ) {
+        await this.prisma.user.update({
+            where: { id: requestUser.id },
+            data: {
+                token_version: {increment: 1},
+            },
+        });
+
+        return {
+            message: 'User log out successfully'
+        }
+    }
+
+    async validateUser(email: string, password: string) {
+        const user = await this.prisma.user.findUnique({ 
+            where: { email },
+            include: {
+                orders: true,
+                stores: true,
+                cartItem: true,
+                userProfile: true,
+            }
+        });
+
+        if (!user) {
+            throw new NotFoundException ('User not found')
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+        console.log('Password valid?', isPasswordValid);
+
+        if (!isPasswordValid) {
+            throw new UnauthorizedException ('Invalid password')
+        }
+
+        return user;
     }
 }

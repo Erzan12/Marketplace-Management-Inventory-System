@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 export interface ChangeInfo {
     from: string;
@@ -17,11 +18,27 @@ export class AnalyticsService {
     constructor(private prisma: PrismaService) {}
 
     async getInventoryAnalytics() {
-        const products = await this.prisma.product.findMany();
+        const products = await this.prisma.inventory.findMany({
+            include: {
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                    }
+                }
+            }
+        });
 
         const totalProducts = products.length;
         const totalUnits = products.reduce((sum, p) => sum + p.quantity, 0);
-        const totalValueNumber = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        // const totalValueNumber = products.reduce((sum, p) => sum + (p.product.price * p.quantity), 0);
+        const totalValueDecimal = products.reduce(
+            (sum, p) => sum.add(p.product.price.mul(p.quantity)),
+            new Prisma.Decimal(0)
+        );
+
+        const totalValueNumber = totalValueDecimal.toNumber();
 
         //Format current total value
         const totalValueFormatted =`₱${totalValueNumber.toLocaleString(undefined, {
@@ -100,22 +117,36 @@ export class AnalyticsService {
 
     @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
     async saveMonthlyInventorySnapshot() {
-        const products = await this.prisma.product.findMany();
-        const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const products = await this.prisma.inventory.findMany({
+            include: {
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                    }
+                }
+            }
+        });
+        const totalValueDecimal = products.reduce(
+            (sum, p) => sum.add(p.product.price.mul(p.quantity)),
+            new Prisma.Decimal(0)
+        );
+
+        const totalValueNumber = totalValueDecimal.toNumber();
 
         const now = new Date();
         const monthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
 
         await this.prisma.inventorySnapshot.upsert({
             where: { month: monthKey },
-            update: { totalValue },
+            update: { totalValue: totalValueNumber },
             create: {
                 month: monthKey,
-                totalValue,
-            },
+                totalValue: totalValueNumber            },
         });
 
-        this.logger.log(`✅ Inventory snapshot saved for ${monthKey} with value ₱${totalValue.toFixed(2)}`);
+        this.logger.log(`✅ Inventory snapshot saved for ${monthKey} with value ₱${totalValueNumber.toFixed(2)}`);
     }
 
     // Automatic testing of inventory snapshot no need to be enrolled in controller or use postman

@@ -1,8 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query} from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { RestockProductDto } from './dto/restock-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { Authenticated, Roles, Public } from '../../common/decorators/public.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetProductsQueryDto } from './dto/get-product-query.dto';
@@ -55,23 +53,23 @@ export class ProductController {
   }
 
   // Admin only - Restock product
-  @Authenticated()
-  @Patch(':id/restock')
-  @Roles('admin')
-  restock(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: RestockProductDto
-  ) {
-    return this.productService.restockProduct(id, dto.quantity);
-  }
+  // @Authenticated()
+  // @Patch(':id/restock')
+  // @Roles('admin')
+  // restock(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() dto: RestockProductDto
+  // ) {
+  //   return this.productService.restockProduct(id, dto.quantity);
+  // }
 
-  // Admin only - Low stock alert
-  @Authenticated()
-  @Get('low-stock')
-  @Roles('admin')
-  getLowStockProducts(@Query('threshold') threshold = 5) {
-    return this.productService.getLowStockProducts(threshold);
-  }
+  // // Admin only - Low stock alert
+  // @Authenticated()
+  // @Get('low-stock')
+  // @Roles('admin')
+  // getLowStockProducts(@Query('threshold') threshold = 5) {
+  //   return this.productService.getLowStockProducts(threshold);
+  // }
 
   // Admin only - Reorder recommendations
   @Authenticated()

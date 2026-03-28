@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus, BadRequestException, ConflictException  } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateProductDto } from './dto/product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { buildErrorResponse } from '../../common/helpers/response-helper';
 import { RESPONSE_MESSAGES } from '../../common/constants/response-messages.constant';
@@ -73,34 +72,34 @@ export class ProductService {
   }
 
   //Admin restock product
-  async restockProduct(productId: number, quantity: number) {
-    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+  // async restockProduct(productId: number, quantity: number) {
+  //   const product = await this.prisma.inventory.findUnique({ where: { id: productId } });
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  //   if (!product) {
+  //     throw new NotFoundException('Product not found');
+  //   }
 
-    return this.prisma.product.update({
-      where: { id: productId },
-      data: {
-        quantity: product.quantity + quantity,
-      },
-    });
-  }
+  //   return this.prisma.inventory.update({
+  //     where: { id: productId },
+  //     data: {
+  //       quantity: product.quantity + quantity,
+  //     },
+  //   });
+  // }
 
   //Admin low stocks alert
-  async getLowStockProducts(threshold: number) {
-    return this.prisma.product.findMany({
-      where: {
-        quantity: {
-          lt: threshold,
-        },
-      },
-      orderBy: {
-        quantity: 'asc',
-      },
-    });
-  }
+  // async getLowStockProducts(threshold: number) {
+  //   return this.prisma.inventory.findMany({
+  //     where: {
+  //       quantity: {
+  //         lt: threshold,
+  //       },
+  //     },
+  //     orderBy: {
+  //       quantity: 'asc',
+  //     },
+  //   });
+  // }
 
   //Reorder Recommendations
   async getReorderRecommendations(days = 7, stockThreshold = 10, minSales = 2) {

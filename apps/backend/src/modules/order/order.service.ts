@@ -1,13 +1,13 @@
 // src/order/order.service.ts
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto, OrderStatus } from './dto/update-order-status.dto';
+import { CreateOrderDto } from './dto/order.dto';
+import { UpdateOrderStatusDto } from './dto/order.dto';
 import * as streamBuffers from 'stream-buffers';
 import * as PDFDocument from 'pdfkit';
-import { MailService } from '../modules/mail/mail.service';
-import { Product } from '../product/entities/product.entity';
 import { CartService } from '../cart/cart.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { OrderStatus } from '../../shared/constants/enums.decorator';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrderService {
@@ -309,8 +309,18 @@ export class OrderService {
 
       // Validate stock first
       for (const item of cartItems) {
-        const product = await tx.product.findUnique({
+        const product = await tx.inventory.findUnique({
           where: { id: item.productId },
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                slug: true,
+              }
+            }
+          }
         });
 
         if (!product) {
@@ -319,7 +329,7 @@ export class OrderService {
 
         if (item.quantity > product.quantity) {
           throw new BadRequestException(
-            `Not enough stock for "${product.name}". Available: ${product.quantity}`
+            `Not enough stock for "${product.product.name}". Available: ${product.quantity}`
           );
         }
       }
@@ -362,7 +372,7 @@ export class OrderService {
         console.log('Calculated total:', total);
           // Decrement product quantities
       for (const item of cartItems) {
-        await tx.product.update({
+        await tx.inventory.update({
           where: { id: item.productId },
           data: {
             quantity: { decrement: item.quantity },

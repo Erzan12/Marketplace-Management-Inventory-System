@@ -1,23 +1,35 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Authenticated, Public } from '../common/decorators/public.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LogInDto } from './dto/log-in.dto';
+import { Authenticated, Public } from '../../common/decorators/public.decorator';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiPostResponse } from '../../shared/helpers/swagger-api-response.helper';
 
-@Authenticated()
+// @Authenticated()
 @Controller('auth')
 export class AuthController {
-    constructor(private auth: AuthService) {}
+    constructor(private authService: AuthService) {}
 
     @Public()
     @Post('login')
     login(@Body() dto: LogInDto) {
-        return this.auth.login(dto);
+        return this.authService.login(dto);
     }
 
-    @Public()
-    @Post('register')
-    register(@Body() dto: CreateUserDto) {
-        return this.auth.register(dto);
+   
+    @Post()
+    @ApiBody({
+        type: CreateUserDto,
+        description: 'Payload to create a User Account'
+    })
+    @ApiOperation({
+        summary: 'Create a User account',
+    })
+    @ApiPostResponse('User Account created successfully')
+    createUser(
+        @Body() dto: CreateUserDto,
+    ) {
+        return this.authService.register(dto)
     }
 }

@@ -1,11 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { Roles } from '../common/decorators/public.decorator';
 // import { Role } from '../auth/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../common/guard/roles.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/public.decorator';
+import { RolesGuard } from '../../common/guard/roles.guard';
 
 @ApiBearerAuth()
 @Controller('api/analytics')
