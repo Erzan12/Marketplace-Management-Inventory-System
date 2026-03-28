@@ -93,11 +93,40 @@ async function main() {
     accessories: ['Wallet', 'Sunglasses', 'Belt', 'Watch'],
   };
 
-  const getImage = (name: string) =>
-    `https://source.unsplash.com/featured/?${encodeURIComponent(name)}`;
+  const getImage = (name: string) => {
+    return imageMap[name] || imageMap['Watch']; // fallback if not found
+  };
+
+  // const getImage = (name: string) =>
+  //   `https://source.unsplash.com/featured/?${encodeURIComponent(name)}`;
 
   // 🛒 GENERATE PRODUCTS (100+)
   const products: any[] = [];
+
+  const imageMap: Record<string, string> = {
+    Headphones: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+    Keyboard: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
+    Mouse: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3',
+    Speaker: 'https://images.unsplash.com/photo-1545454675-3531b543be5d',
+    'Smart Watch': 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b',
+
+    Backpack: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62',
+    Shoes: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
+    Hoodie: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7',
+    Jacket: 'https://images.unsplash.com/photo-1520975922203-b1d7c2c9c4bb',
+    Shorts: 'https://images.unsplash.com/photo-1593032465171-8f0c6cfa3c0f',
+
+    Candle: 'https://images.unsplash.com/photo-1603006905003-be475563bc59',
+    Bottle: 'https://images.unsplash.com/photo-1524593119773-3f8c7b0e4a47',
+    Diffuser: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb',
+    'Yoga Mat': 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e',
+    Mug: 'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a',
+
+    Wallet: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc',
+    Sunglasses: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083',
+    Belt: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7',
+    Watch: 'https://images.unsplash.com/photo-1511385348-a52b4a160dc2',
+  };
 
   Object.entries(templates).forEach(([key, items]) => {
     items.forEach((item) => {
