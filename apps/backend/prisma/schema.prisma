@@ -13,27 +13,28 @@ datasource db {
 }
 
 enum OrderStatus {
-  pending
-  paid
-  shipped
-  completed
-  cancelled
+  PENDING
+  PAID
+  SHIPPED
+  COMPLETED
+  CANCELLED
 }
 
 enum Role {
-  user
-  admin
+  ADMIN
+  SELLER
+  CUSTOMER
 }
 
 model User {
   id          Int          @id @default(autoincrement())
   email       String       @unique
   password    String
-  role        Role         @default(user)
+  role        Role         @default(CUSTOMER)
   orders      Order[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  CartItem    CartItem[]
+  cartItem    CartItem[]
   userProfile UserProfile?
   stores      Store[]
 }
@@ -65,8 +66,7 @@ model Product {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  price       Float
-  quantity    Int
+  price       Decimal  @db.Decimal(10, 2)
   categoryId  Int?
   slug        String   @unique
   storeId     Int
@@ -79,6 +79,15 @@ model Product {
   CartItem   CartItem[]
   images     String[] // Simple array of URLs for now
   orderItems OrderItem[]
+  inventory  Inventory?
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  productId Int      @unique
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  updatedAt DateTime @updatedAt
 }
 
 model Store {
@@ -96,7 +105,7 @@ model Order {
   userId    Int
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     OrderItem[]
-  status    String      @default("pending") // or enum later
+  status    OrderStatus @default(PENDING) // or enum later
   total     Float       @default(0)
   createdAt DateTime    @default(now())
 }

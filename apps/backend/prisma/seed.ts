@@ -31,7 +31,7 @@ async function main() {
     data: {
       email: 'admin@mystore.com',
       password: passwordHash,
-      role: Role.admin,
+      role: Role.ADMIN,
       userProfile: {
         create: {
           firstName: 'Earl',
@@ -145,10 +145,15 @@ async function main() {
               priceRanges[key][0]
             ).toFixed(2)
           ),
-          quantity: rand(10, 150),
           images: [getImage(item)],
           categoryId: categoryMap[key].id,
           storeId: storeMap[storeByCategory[key]].id,
+
+          inventory: {
+            create: {
+              quantity: rand(10, 150),
+            },
+          },
         });
       }
     });
