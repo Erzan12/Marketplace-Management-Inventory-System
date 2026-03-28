@@ -35,7 +35,7 @@ export class InvoiceService {
 
         //Plain Invoice Receipt
         const totals = order.items.reduce((sum, item) => {
-            return sum + item.quantity * item.price;
+            return sum + item.quantity * item.price.toNumber();
         }, 0);
 
         return {
@@ -46,7 +46,7 @@ export class InvoiceService {
                 name: item.product.name,
                 quantity: item.quantity,
                 unitPrice: item.price,
-                totatPrice: item.quantity * item.price,
+                totatPrice: item.quantity * item.price.toNumber(),
             })),
             totals,
             status: order.status,

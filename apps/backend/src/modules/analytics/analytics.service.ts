@@ -51,22 +51,27 @@ export class AnalyticsService {
         lastMonth.setMonth(lastMonth.getMonth() - 1);
         const snapshotKey = `${lastMonth.getFullYear()}-${(lastMonth.getMonth() + 1). toString().padStart(2, '0')}`;
         
-        const lastMonthSnapshot = await this.prisma.inventorySnapshot.findUnique({
-            where: { month: snapshotKey },
+        const lastMonthSnapshot = await this.prisma.inventorySnapshot.findFirst({
+            where: {
+                month: {
+                gte: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
+                lt: new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 1),
+                },
+            },
         });
 
         let changeInfo: ChangeInfo | null = null;
 
         if (lastMonthSnapshot) {
-            const lastValue = lastMonthSnapshot.totalValue;
+            const lastValue = lastMonthSnapshot.totalValue.toNumber();
             const diff = totalValueNumber - lastValue;
             const rawPercentage = (diff / lastValue) * 100;
 
             changeInfo = {
                 from: snapshotKey,
-                lastMonthValue: `₱${lastValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+                lastMonthValue: `₱${lastValue.toLocaleString()}`,
                 change: diff > 0 ? 'increase' : 'decrease',
-                amount: `₱${Math.abs(diff).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+                amount: `₱${Math.abs(diff).toLocaleString()}`,
                 percentage: `${Math.abs(rawPercentage).toFixed(2)}%`,
             };
         }
@@ -119,34 +124,38 @@ export class AnalyticsService {
     async saveMonthlyInventorySnapshot() {
         const products = await this.prisma.inventory.findMany({
             include: {
-                product: {
-                    select: {
-                        id: true,
-                        name: true,
-                        price: true,
-                    }
-                }
-            }
+            product: {
+                select: {
+                id: true,
+                name: true,
+                price: true,
+                },
+            },
+            },
         });
+
         const totalValueDecimal = products.reduce(
             (sum, p) => sum.add(p.product.price.mul(p.quantity)),
             new Prisma.Decimal(0)
         );
 
-        const totalValueNumber = totalValueDecimal.toNumber();
-
         const now = new Date();
-        const monthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+
+        //First day of current month
+        const monthDate = new Date(now.getFullYear(), now.getMonth(), 1);
 
         await this.prisma.inventorySnapshot.upsert({
-            where: { month: monthKey },
-            update: { totalValue: totalValueNumber },
+            where: { month: monthDate },
+            update: { totalValue: totalValueDecimal },
             create: {
-                month: monthKey,
-                totalValue: totalValueNumber            },
+            month: monthDate,
+            totalValue: totalValueDecimal,
+            },
         });
 
-        this.logger.log(`✅ Inventory snapshot saved for ${monthKey} with value ₱${totalValueNumber.toFixed(2)}`);
+        this.logger.log(
+            `✅ Inventory snapshot saved for ${monthDate.toISOString()} with value ₱${totalValueDecimal.toFixed(2)}`
+        );
     }
 
     // Automatic testing of inventory snapshot no need to be enrolled in controller or use postman

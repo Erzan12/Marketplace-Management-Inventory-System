@@ -301,97 +301,68 @@ export class OrderService {
         throw new BadRequestException('User ID is missing');
       }
 
-      const cartItems = await this.cartService.viewCart(userId);
-      if (cartItems.length === 0) {
-        throw new BadRequestException('Cart is empty');
-      }
-      
-      return this.prisma.$transaction(async (tx) => {
+    const cartItems = await this.cartService.viewCart(userId);
+    if (cartItems.length === 0) {
+      throw new BadRequestException('Cart is empty');
+    }
+    
+    return this.prisma.$transaction(async (tx) => {
 
-      // Validate stock first
-      for (const item of cartItems) {
-        const product = await tx.inventory.findUnique({
-          where: { id: item.productId },
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                price: true,
-                slug: true,
-              }
-            }
-          }
-        });
-
-        if (!product) {
-          throw new NotFoundException(`Product ID ${item.productId} not found`);
-        }
-
-        if (item.quantity > product.quantity) {
-          throw new BadRequestException(
-            `Not enough stock for "${product.product.name}". Available: ${product.quantity}`
-          );
-        }
-      }
-
-      // Calculate total price with tax
-      let subTotal = new Prisma.Decimal(0);
-
-      // const itemsData = cartItems.map((item) => {
-      //   const itemTotal = item.quantity * item.product.price;
-      //   subTotal += itemTotal;
-      //   return {
-      //     productId: item.productId,
-      //     quantity: item.quantity,
-      //     price: item.product.price,
-      //   };
-      // });
-
-      // const itemsData = cartItems.map((item) => {
-      //   const itemTotal = item.product.price.mul(item.quantity);
-      //   subTotal = subTotal.add(itemTotal);
-
-      //   return {
-      //     quantity: item.quantity,
-      //     price: item.product.price, // keep Decimal
-      //     product: {
-      //       connect: { id: item.productId }, // ✅ FIX
-      //     },
-      //   };
-      // });
-
-      const itemsData = cartItems.map(item => ({
-        quantity: item.quantity,
-        price: item.product.price.toNumber(), // ✅ convert Decimal to number
-        product: { connect: { id: item.productId } },
-      }));
-
-      // const tax = subTotal * taxRate;
-      // const total = subTotal + tax;
-
-      const taxRate = new Prisma.Decimal(0.12);
-      const tax = subTotal.mul(taxRate);
-      const total = subTotal.add(tax);
-
-      type OrderWithUserAndItems = Prisma.OrderGetPayload<{
-        include: {
-          user: true;
-          items: { include: { product: true } };
-        };
-      }>;
-
-      const order: OrderWithUserAndItems = await tx.order.create({
-        data: {
-          userId,
-          total: total.toNumber(),
-          items: { create: itemsData },
-        },
-        include: {
-          items: { include: { product: true } },
-          user: true,
-        },
+    // Validate stock first
+    for (const item of cartItems) {
+      const product = await tx.inventory.findUnique({
+        where: { id: item.productId },
+        include: { product: { include: { store: true } } },
       });
+
+      if (!product) {
+        throw new NotFoundException(`Product ID ${item.productId} not found`);
+      }
+
+      if (item.quantity > product.quantity) {
+        throw new BadRequestException(
+          `Not enough stock for "${product.product.name}". Available: ${product.quantity}`
+        );
+      }
+    }
+
+      // Calculate totals
+    let subTotal = new Prisma.Decimal(0);
+    const itemsData = cartItems.map(item => {
+      const priceDecimal = new Prisma.Decimal(item.product.price);
+      const lineTotal = priceDecimal.mul(item.quantity);
+      subTotal = subTotal.add(lineTotal);
+
+      return {
+        quantity: item.quantity,
+        price: priceDecimal,
+        product: { connect: { id: item.productId } },
+      };
+    });
+
+    const taxRate = new Prisma.Decimal(0.12);
+    const tax = subTotal.mul(taxRate);
+    const total = subTotal.add(tax);
+
+    const storeId = cartItems[0].product.storeId;
+
+    type OrderWithUserAndItems = Prisma.OrderGetPayload<{
+      include: { user: true; store: true; items: { include: { product: true } } };
+    }>;
+
+    const order: OrderWithUserAndItems = await tx.order.create({
+      data: {
+        userId,
+        storeId,
+        total, // keep as Decimal
+        items: { create: itemsData },
+      },
+      include: {
+        items: { include: { product: true } },
+        user: true,
+        store: true,
+      },
+    });
 
       // fetch with relations
       // const order = await tx.order.findUnique({
@@ -486,7 +457,7 @@ export class OrderService {
 
       order?.items.forEach((item) => {
         const y = doc.y; // Capture current Y before writing the row
-        const subtotal = item.quantity * item.price;
+        const subtotal = item.quantity * item.price.toNumber();
 
         // Draw the row's text
         doc.text(item.product?.name ?? `Product ID #${item.productId}`, itemX, y, { //added a product Id # fallback incase product name is empty
@@ -498,7 +469,7 @@ export class OrderService {
         });
 
         // Manually type PHP since Peso sign display +- in the invoice | to be fixed in the future
-        doc.text(`Php${item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, priceX, y, { 
+        doc.text(`Php${item.price.toLocaleString()}`, priceX, y, { 
           width: priceWidth,
           align: 'center',
         });
