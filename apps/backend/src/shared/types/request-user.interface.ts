@@ -4,4 +4,5 @@ export interface RequestUser {
   role: string;
   token_version: number;
   is_active: boolean;
+  request_token?: string | null;
 }

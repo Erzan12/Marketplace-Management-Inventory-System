@@ -38,6 +38,7 @@ model User {
   password      String
   role          Role     @default(CUSTOMER)
   token_version Int      @default(0)
+  refresh_token String?
   is_active     Boolean  @default(true)
   last_login    DateTime @default(now())
 

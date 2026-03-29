@@ -8,4 +8,5 @@ export interface AuthenticatedRequest extends Request {
 export interface JwtPayload {
   id: string;
   tokenVersion: number;
+  request_token: string;
 }

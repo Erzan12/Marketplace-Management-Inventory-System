@@ -47,6 +47,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             email: user.email,
             role: user.role,
             token_version: user.token_version,
+            request_token: user.refresh_token ?? null, // nullable
             is_active: user.is_active,
         };
     }

@@ -7,6 +7,7 @@ import { LogInDto } from './dto/log-in.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RESPONSE_MESSAGES } from '../../common/constants/response-messages.constant';
 import { RequestUser } from '../../shared/types/request-user.interface';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -102,9 +103,23 @@ export class AuthService {
             role: userValidate.role
         }
 
-        const token = this.jwtService.sign(payload, { 
+        const accessToken = this.jwtService.sign(payload, { 
             secret: process.env.JWT_SECRET,
-            expiresIn: '8h'
+            expiresIn: '1m'
+        });
+
+        const refreshToken = this.jwtService.sign(payload, { 
+            secret: process.env.JWT_REFRESH_SECRET,
+            expiresIn: '7d'
+        });
+
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                refresh_token: hashedRefreshToken,
+            },
         });
 
         await this.prisma.user.update({
@@ -117,7 +132,8 @@ export class AuthService {
         return {
             status: 1,
             message: 'Login successful',
-            token,
+            accessToken,
+            refreshToken,
             payload,
         };
     }
@@ -128,6 +144,7 @@ export class AuthService {
             where: { id: requestUser.id }, // make sure this matches your interface
             data: {
                 token_version: { increment: 1 },
+                refresh_token: null,
             },
             });
 
@@ -196,4 +213,43 @@ export class AuthService {
             }
         }
     }
+
+    async refreshToken(rawRefreshToken: string) {
+        try {
+            // 1. Verify the raw refresh token hasn't expired
+            const payload = this.jwtService.verify(rawRefreshToken, {
+                secret: process.env.JWT_REFRESH_SECRET,
+            });
+
+            // 2. Find the user by the ID stored inside the refresh token
+            const user = await this.prisma.user.findUnique({
+                where: { id: payload.id },
+            });
+
+            if (!user || !user.refresh_token) {
+                throw new ForbiddenException('Access denied');
+            }
+
+            // 3. Bcrypt compare: (RAW token from cookie, HASHED token from DB)
+            const isMatch = await bcrypt.compare(
+                rawRefreshToken,
+                user.refresh_token
+            );
+
+            if (!isMatch) {
+                throw new ForbiddenException('Invalid refresh token');
+            }
+
+            // 4. Generate a brand new access token
+            const newAccessToken = this.jwtService.sign(
+                { id: user.id, email: user.email, role: user.role },
+                { secret: process.env.JWT_SECRET, expiresIn: '1m' } // Still short-lived!
+            );
+
+            return { accessToken: newAccessToken };
+        } catch (error) {
+            throw new ForbiddenException('Invalid or expired refresh token');
+        }
+    }
+
 }
