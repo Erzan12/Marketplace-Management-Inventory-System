@@ -232,7 +232,7 @@ export function ProductsPageClient() {
                           )}
                         </div> */}
                         <div className="flex items-center gap-2 mb-4 h-8">
-                          <span className="text-2xl font-bold text-black">${product.price.toFixed(2)}</span>
+                          <span className="text-2xl font-bold text-black">${Number(product.price).toFixed(2)}</span>
                         </div>
 
                         <div className="mt-auto">

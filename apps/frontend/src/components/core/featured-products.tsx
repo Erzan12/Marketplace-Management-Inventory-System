@@ -14,7 +14,7 @@ import { useProducts } from "@/hooks/useProducts"
 
 export function FeaturedProducts() {
   // Fetching from NestJS (limiting to 6 for the featured section)
-  const { data: apiResponse, isLoading, error } = useProducts({ limit: 8 })
+  const { data: apiResponse, isLoading, error } = useProducts()
   const { addItem } = useCart()
   
   // Track which products are being added to show individual loading states
@@ -132,7 +132,7 @@ export function FeaturedProducts() {
 
                       <div className="flex items-center gap-2 mb-4 h-8">
                         <span className="text-2xl font-bold text-black">
-                          ${productData.price.toFixed(2)}
+                          ${Number(productData.price).toFixed(2)}
                         </span>
                       </div>
 

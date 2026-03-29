@@ -159,7 +159,7 @@ export function Hero() {
                         <span className="text-sm text-gray-600 ml-1">(4.9)</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-xl text-black">${productDetails.price.toFixed(2)}</span>
+                        <span className="font-bold text-xl text-black">${Number(productDetails.price).toFixed(2)}</span>
                         {productDetails.hasDiscount && productDetails.compareAtPrice && (
                           <span className="text-sm text-gray-500 line-through">
                             ${productDetails.compareAtPrice.toFixed(2)}
