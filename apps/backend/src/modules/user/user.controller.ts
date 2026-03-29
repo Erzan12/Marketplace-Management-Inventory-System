@@ -1,8 +1,7 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserProfileDto } from './dto/user.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
-import { ApiPostResponse } from '../../shared/helpers/swagger-api-response.helper';
 import { RequestUser } from '../../shared/types/request-user.interface';
 import { SessionUser } from '../../shared/types/session-user.decorator';
 
@@ -10,20 +9,22 @@ import { SessionUser } from '../../shared/types/session-user.decorator';
 export class UserController {
     constructor(private userService: UserService) {}
 
-    @Put(':userId')
+    @Get('me')
+    getUserProfile(@SessionUser() requestUser: RequestUser) {
+        return this.userService.getUserProfile(requestUser);
+    }
+
+    @Put('me')
     @ApiBody({
         type: CreateUserProfileDto,
-        description: 'Payload to add user profile to a user',
     })
     @ApiOperation({
-        summary: 'Create/Add user profile data for a user',
+        summary: 'Create or update user profile',
     })
-    @ApiPostResponse('User profile added successfully')
-    createUserProfile (
+    updateUserProfile(
         @Body() dto: CreateUserProfileDto,
-        @Param('userId') userId: number,
         @SessionUser() requestUser: RequestUser,
     ) {
-        return this.userService.createUserProfile(requestUser, userId, dto)
+        return this.userService.upsertUserProfile(requestUser, dto);
     }
 }
