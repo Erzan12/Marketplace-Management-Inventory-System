@@ -33,7 +33,7 @@ enum Role {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid()) @db.Uuid
   email         String   @unique
   password      String
   role          Role     @default(CUSTOMER)
@@ -54,12 +54,16 @@ model User {
 }
 
 model UserProfile {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @unique
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @unique @db.Uuid
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   firstName   String?
+  middleName  String?
   lastName    String?
   avatarURL   String?
+  address     String?
+  city        String?
+  country     String?
   bio         String?
   phone       String?
   dateOfBirth DateTime?
@@ -70,12 +74,12 @@ model UserProfile {
 }
 
 model Category {
-  id        Int     @id @default(autoincrement())
+  id        String  @id @default(uuid()) @db.Uuid
   name      String  @unique
   slug      String  @unique
   is_active Boolean @default(true)
 
-  parentId Int?
+  parentId String?  @db.Uuid 
   parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
   children Category[] @relation("CategoryToCategory")
 
@@ -88,13 +92,13 @@ model Category {
 }
 
 model Product {
-  id          Int     @id @default(autoincrement())
+  id          String  @id @default(uuid()) @db.Uuid
   name        String
   description String?
   price       Decimal @db.Decimal(10, 2)
-  categoryId  Int?
+  categoryId  String?  @db.Uuid
   slug        String
-  storeId     Int
+  storeId     String  @db.Uuid
   is_active   Boolean @default(true)
   status      ProductStatus  @default(DRAFT) // ACTIVE, DRAFT, ARCHIVED
 
@@ -119,10 +123,10 @@ model Product {
 }
 
 model ProductImage {
-  id  Int    @id @default(autoincrement())
-  url String
+  id        String   @id @default(uuid()) @db.Uuid
+  url       String
 
-  productId Int
+  productId String  @db.Uuid
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   type      String? // e.g. "thumbnail", "gallery"
@@ -136,8 +140,8 @@ model ProductImage {
 }
 
 model Inventory {
-  id                Int      @id @default(autoincrement())
-  productId         Int      @unique
+  id                String   @id @default(uuid()) @db.Uuid
+  productId         String   @unique  @db.Uuid
   product           Product  @relation(fields: [productId], references: [id])
   quantity          Int
   lowStockThreshold Int      @default(5)
@@ -147,9 +151,9 @@ model Inventory {
 }
 
 model StoreMember {
-  id      Int  @id @default(autoincrement())
-  userId  Int
-  storeId Int
+  id      String   @id @default(uuid()) @db.Uuid
+  userId  String  @db.Uuid
+  storeId String  @db.Uuid
   role    Role // or separate enum
 
   user  User  @relation(fields: [userId], references: [id])
@@ -161,11 +165,11 @@ model StoreMember {
 }
 
 model Store {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid()) @db.Uuid
   logoUrl   String?
   name      String   @unique
   slug      String   @unique
-  userId    Int
+  userId    String   @db.Uuid
   is_active Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -179,9 +183,9 @@ model Store {
 }
 
 model Order {
-  id        Int         @id @default(autoincrement())
-  userId    Int
-  storeId   Int
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  storeId   String   @db.Uuid
   items     OrderItem[]
   status    OrderStatus @default(PENDING) // or enum later
   total     Decimal     @db.Decimal(10, 2)
@@ -197,10 +201,10 @@ model Order {
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
-  orderId   Int
+  id        String  @id @default(uuid()) @db.Uuid
+  orderId   String  @db.Uuid
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId Int
+  productId String  @db.Uuid
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Decimal @db.Decimal(10, 2)
@@ -209,9 +213,9 @@ model OrderItem {
 }
 
 model CartItem {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  productId Int
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
   quantity  Int
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -222,7 +226,7 @@ model CartItem {
 }
 
 model InventorySnapshot {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid()) @db.Uuid
   month      DateTime @unique
   totalValue Decimal  @db.Decimal(12, 2)
   createdAt  DateTime @default(now())
@@ -233,9 +237,9 @@ model InventorySnapshot {
 
 //for expansion adding reviews
 model Review {
-  id        Int     @id @default(autoincrement())
-  userId    Int
-  productId Int
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
   rating    Int
   comment   String?
 
