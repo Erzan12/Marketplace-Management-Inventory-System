@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
@@ -7,7 +7,6 @@ import { LogInDto } from './dto/log-in.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RESPONSE_MESSAGES } from '../../common/constants/response-messages.constant';
 import { RequestUser } from '../../shared/types/request-user.interface';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -43,8 +42,32 @@ export class AuthService {
                 email,
                 password: hashedPassword,
                 role,
+                userProfile: {
+                    create: {},     //create an empty user profile object for user to update later if user account is created
+                }
             }
         })
+
+        // ADMIN CHECK VALIDATOR IN API
+        // const requestUser = await this.prisma.user.findUnique({
+        //     where: { id: currentUser.id },
+        //     include: {
+        //         userProfile: true,
+        //     },
+        // });
+
+        // if (!requestUser || requestUser.role !== Role.ADMIN ) {
+        //     throw new BadRequestException(`User does not exist.`);
+        // }
+
+        // const isAdmin = 
+        //     requestUser.role === Role.ADMIN;
+
+        // if (!isAdmin) {
+        //     throw new ForbiddenException(
+        //         'You are not allowed to perform this action',
+        //     );
+        // }
 
         return {
             status: 'success',
