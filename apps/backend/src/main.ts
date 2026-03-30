@@ -51,7 +51,7 @@ async function bootstrap() {
   // })
 
   await app.listen(port, '0.0.0.0'); // Adding '0.0.0.0' is important for Docker/Cloud environments
-  console.log(`Server is running at http://0.0.0.0:${port}/api`);
-  console.log(`Swagger docs at http://0.0.0.0:${port}/api-docs`);
+  console.log(`Server is running at /api (Render dynamic port: ${port})`);
+  console.log(`Swagger docs at /api-docs`);
 }
 bootstrap();
