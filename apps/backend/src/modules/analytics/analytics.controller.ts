@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { Roles } from '../../common/decorators/public.decorator';
 
-@Controller('api/analytics')
+@Controller('analytics')
 export class AnalyticsController {
     constructor( private analyticsService: AnalyticsService) {}
     
