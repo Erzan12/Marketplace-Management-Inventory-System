@@ -7,15 +7,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import { FakeAuthMiddleware } from './auth/fake-auth.middleware';
 
 async function bootstrap() {
-  // New code
-  const port = process.env.PORT || 3001; 
-
   const app = await NestFactory.create(AppModule);
-
+  const port = process.env.PORT || 3001; 
   const cookieParser = require('cookie-parser');
 
   // handle cookies
   app.use(cookieParser());
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Marketplace Management Inventory System (ShopStack)')
@@ -34,9 +32,11 @@ async function bootstrap() {
     .build();
 
   const documentFactory =  () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
 
-  // ✅ Enable CORS for frontend on ports 3000 and 3001
+  //Move Swagger to /api-docs so it doesn't fight with the /api prefix
+  SwaggerModule.setup('api-docs', app, documentFactory);
+
+  // Enable CORS for frontend on ports 3000 and 3001
   app.enableCors({
     origin: ['http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -50,9 +50,8 @@ async function bootstrap() {
   //   console.log("Swagger API is ruuning at http://localhost:3001/api")
   // })
 
-  app.setGlobalPrefix('api');
-
   await app.listen(port, '0.0.0.0'); // Adding '0.0.0.0' is important for Docker/Cloud environments
-  console.log(`Server is running at http://localhost:${port}`)
+  console.log(`Server is running at http://0.0.0.0:${port}/api`);
+  console.log(`Swagger docs at http://0.0.0.0:${port}/api-docs`);
 }
 bootstrap();
