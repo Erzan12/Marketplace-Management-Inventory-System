@@ -17,5 +17,12 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*",
+    // "test/**/*",
+    "src/types/express.ts",
+    "public",
+    ".d.ts"
+  ] 
 }

@@ -12,91 +12,211 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
 enum OrderStatus {
-  pending
-  paid
-  shipped
-  completed
-  cancelled
+  PENDING
+  PAID
+  SHIPPED
+  COMPLETED
+  CANCELLED
 }
 
 enum Role {
-  user
-  admin
+  ADMIN
+  SELLER
+  CUSTOMER
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  password    String
-  role        Role         @default(user)
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @unique
+  password      String
+  role          Role     @default(CUSTOMER)
+  token_version Int      @default(0)
+  refresh_token String?
+  is_active     Boolean  @default(true)
+  last_login    DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   orders      Order[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  CartItem    CartItem[]
+  stores      Store[]
+  cartItem    CartItem[]
   userProfile UserProfile?
+
+  storeMembers StoreMember[]
+  reviews      Review[]
 }
 
 model UserProfile {
-  id         Int       @id @default(autoincrement())
-  userId     Int       @unique
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  firstName  String?
-  lastName   String?
-  avatarURL  String?
-  bio        String?
-  phone      String?
-  dateOfBirt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @unique @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName   String?
+  middleName  String?
+  lastName    String?
+  avatarURL   String?
+  address     String?
+  city        String?
+  country     String?
+  bio         String?
+  phone       String?
+  dateOfBirth DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  isDeleted Boolean @default(false) //soft deletes
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  products  Product[] // One-to-many relationship
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String  @id @default(uuid()) @db.Uuid
+  name      String  @unique
+  slug      String  @unique
+  is_active Boolean @default(true)
+
+  parentId String?  @db.Uuid 
+  parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryToCategory")
+
+  products Product[] // One-to-many relationship
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isDeleted Boolean @default(false) //soft deletes
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
+  id          String  @id @default(uuid()) @db.Uuid
   name        String
   description String?
-  price       Float
-  quantity    Int
-  categoryId  Int?
-  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  CartItem    CartItem[]
+  price       Decimal @db.Decimal(10, 2)
+  categoryId  String?  @db.Uuid
+  slug        String
+  storeId     String  @db.Uuid
+  is_active   Boolean @default(true)
+  status      ProductStatus  @default(DRAFT) // ACTIVE, DRAFT, ARCHIVED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store    Store     @relation(fields: [storeId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  CartItem   CartItem[]
+  images     ProductImage[]
+  orderItems OrderItem[]
+  inventory  Inventory?
+
+  isDeleted Boolean  @default(false) //soft deletes
+  reviews   Review[]
+
+  @@unique([storeId, slug])
+  //index for performance bootstrap
+  @@index([storeId])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  url       String
+
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  type      String? // e.g. "thumbnail", "gallery"
+  isDeleted Boolean @default(false) // soft deletes for images
+
+  altText   String? // accessibility / SEO
+  isPrimary Boolean @default(false) // main thumbnail
+  sortOrder Int     @default(0) // ordering in UI
+
+  createdAt DateTime @default(now())
+}
+
+model Inventory {
+  id                String   @id @default(uuid()) @db.Uuid
+  productId         String   @unique  @db.Uuid
+  product           Product  @relation(fields: [productId], references: [id])
+  quantity          Int
+  lowStockThreshold Int      @default(5)
+  updatedAt         DateTime @updatedAt
+
+  isDeleted Boolean @default(false) //soft deletes
+}
+
+model StoreMember {
+  id      String   @id @default(uuid()) @db.Uuid
+  userId  String  @db.Uuid
+  storeId String  @db.Uuid
+  role    Role // or separate enum
+
+  user  User  @relation(fields: [userId], references: [id])
+  store Store @relation(fields: [storeId], references: [id])
+
+  isDeleted Boolean @default(false) // soft deletes
+
+  @@unique([userId, storeId])
+}
+
+model Store {
+  id        String   @id @default(uuid()) @db.Uuid
+  logoUrl   String?
+  name      String   @unique
+  slug      String   @unique
+  userId    String   @db.Uuid
+  is_active Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+  user     User      @relation(fields: [userId], references: [id])
+
+  isDeleted    Boolean       @default(false) //soft deletes
+  storeMembers StoreMember[]
+  orders       Order[]
 }
 
 model Order {
-  id        Int         @id @default(autoincrement())
-  userId    Int
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  storeId   String   @db.Uuid
   items     OrderItem[]
-  status    String      @default("pending") // or enum later
-  total     Float       @default(0)
+  status    OrderStatus @default(PENDING) // or enum later
+  total     Decimal     @db.Decimal(10, 2)
+  paidAt    DateTime?
+  shippedAt DateTime?
   createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store Store @relation(fields: [storeId], references: [id])
+
+  isDeleted Boolean @default(false) //soft deletes
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
-  orderId   Int
+  id        String  @id @default(uuid()) @db.Uuid
+  orderId   String  @db.Uuid
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id])
   quantity  Int
-  price     Float
+  price     Decimal @db.Decimal(10, 2)
+
+  isDeleted Boolean @default(false) //soft deletes
 }
 
 model CartItem {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  productId Int
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
   quantity  Int
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -107,8 +227,27 @@ model CartItem {
 }
 
 model InventorySnapshot {
-  id         Int      @id @default(autoincrement())
-  month      String   @unique // e.g "2025-05"
-  totalValue Float
+  id         String   @id @default(uuid()) @db.Uuid
+  month      DateTime @unique
+  totalValue Decimal  @db.Decimal(12, 2)
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  isDeleted Boolean @default(false) //soft deletes
+}
+
+//for expansion adding reviews
+model Review {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
+  rating    Int
+  comment   String?
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  isDeleted Boolean @default(false) //soft deletes
+
+  @@unique([userId, productId]) //one call for uniquer for both userId and productId
 }

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 import { CartItem } from '@/types';
 
 export const useCart = () => {
@@ -10,7 +10,7 @@ export const useCart = () => {
     return useQuery<CartItem[]>({
         queryKey: ['cart'],
         queryFn: async () => {
-            const res = await api.get('/api/orders/my-cart');
+            const res = await apiClient.get('/orders/my-cart');
             return res.data;
         },
         enabled: !!token

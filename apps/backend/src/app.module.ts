@@ -1,28 +1,36 @@
 import { Module } from '@nestjs/common';
-import { ProductModule } from './product/product.module';
-import { PrismaService } from './prisma/prisma.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { CategoryModule } from './category/category.module';
-import { AuthModule } from './auth/auth.module';
-import { OrderModule } from './order/order.module';
-import { CartModule } from './cart/cart.module';
 import { ConfigModule } from '@nestjs/config';
-import { InvoiceService } from './invoice/invoice.service';
-import { InvoiceModule } from './invoice/invoice.module';
-import { MailService } from './mail/mail.service';
-import { MailModule } from './mail/mail.module';
-import { AnalyticsService } from './analytics/analytics.service';
-import { AnalyticsController } from './analytics/analytics.controller';
-import { AnalyticsModule } from './analytics/analytics.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { UserController } from './user/user.controller';
-import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
-import { JwtService } from '@nestjs/jwt';
+import { PrismaModule } from './prisma/prisma.module';
+
+// Guards
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guard/roles.guard';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
-import { AdministratorModule } from './administrator/administrator.module';
+
+// Modules
+import { AdministratorModule } from './modules/administrator/administrator.module';
+import { CategoryModule } from './modules/category/category.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailModule } from './modules/mail/mail.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
+import { OrderModule } from './modules/order/order.module';
+import { CartModule } from './modules/cart/cart.module';
+import { ProductModule } from './modules/product/product.module';
+
+// Services
+import { PrismaService } from './prisma/prisma.service';
+import { InvoiceService } from './modules/invoice/invoice.service';
+import { MailService } from './modules/mail/mail.service';
+import { UserService } from './modules/user/user.service';
+import { AnalyticsService } from './modules/analytics/analytics.service';
+import { JwtService } from '@nestjs/jwt';
+
+// Controllers
+import { AnalyticsController } from './modules/analytics/analytics.controller';
+import { UserController } from './modules/user/user.controller';
 
 @Module({
   imports: [ 

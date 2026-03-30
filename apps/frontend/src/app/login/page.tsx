@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
-import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Lock, Mail, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -26,6 +27,9 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Call useAuth HERE AT THE TOP LEVEL!
+  const { login } = useAuth();
+
   const validateForm = (): boolean => {
     const result = loginSchema.safeParse(formData);
     if (!result.success) {
@@ -41,6 +45,8 @@ export default function LoginPage() {
     setErrors({});
     return true;
   };
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,23 +64,18 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const response = await api.post('/api/auth/login', formData);
-      const { access_token } = response.data;
-      
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('userEmail', formData.email);
-      
+      // Hit the login endpoint
+      // apiClient already has withCredentials: true from our previous step!
+      const response = await apiClient.post('/auth/login', formData);
+
+      // Use the login function here, but DO NOT call useAuth() here.
+      login(formData.email);
       router.push('/');
-    } catch (error: unknown) {
+      
+    } catch (error: any) {
       console.error('Login error:', error);
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
-        setErrorMessage(
-          axiosError.response?.data?.message || 'Login failed. Please check your credentials.'
-        );
-      } else {
-        setErrorMessage('An unexpected error occurred. Please try again.');
-      }
+      // Use the error structure from your Axios interceptor
+      setErrorMessage(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +177,7 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
               <a
-                href="/register"
+                href="/sign-up"
                 className="text-primary hover:underline font-medium"
               >
                 Create one

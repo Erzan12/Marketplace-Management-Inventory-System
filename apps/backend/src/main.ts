@@ -3,16 +3,22 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// import cookieParser from 'cookie-parser';
 // import { FakeAuthMiddleware } from './auth/fake-auth.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const cookieParser = require('cookie-parser');
+
+  // handle cookies
+  app.use(cookieParser());
+
   const config = new DocumentBuilder()
-    .setTitle('Product Inventory Management System(PIMS)')
-    .setDescription('This is the api for PIMS')
+    .setTitle('Marketplace Management Inventory System (ShopStack)')
+    .setDescription('This is the api for ShopStack, ShopStack is a full-stack **multi-tenant marketplace platform** built with modern web technologies.')
     .setVersion('V1.0.0')
-    .addBearerAuth()
+    // .addBearerAuth()
     .addTag('Auth', 'Endpoint for user authentication')
     .addTag('Administrator', 'Manage and maintain the system')
     .addTag('User', 'User profile and dashboard')
@@ -30,6 +36,7 @@ async function bootstrap() {
   // ✅ Enable CORS for frontend on ports 3000 and 3001
   app.enableCors({
     origin: ['http://localhost:3000'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Only needed if you use cookies/auth
   });
 

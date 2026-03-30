@@ -10,7 +10,7 @@ import {
   removeCartLines,
   type ShopifyCart,
   type ShopifyCartLine,
-} from "@/lib/shopify"
+} from "@/lib/shopify/shopify"
 
 export interface CartItem {
   id: string // Shopify ProductVariant ID
