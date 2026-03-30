@@ -42,10 +42,15 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist:true, forbidNonWhitelisted: true}));
 
-  app.listen(3001, () => {
-    console.log("Server is running at http://localhost:3001")
-    console.log("Swagger API is ruuning at http://localhost:3001/api")
-  })
+  // app.listen(3001, () => {
+  //   console.log("Server is running at http://localhost:3001")
+  //   console.log("Swagger API is ruuning at http://localhost:3001/api")
+  // })
+
+  // New code
+  const port = process.env.PORT || 3001; 
+  await app.listen(port, '0.0.0.0'); // Adding '0.0.0.0' is important for Docker/Cloud environments
+  console.log(`Server is running at http://localhost:${port}`)
 
   app.setGlobalPrefix('api');
 }
