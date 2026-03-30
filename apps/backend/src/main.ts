@@ -7,6 +7,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import { FakeAuthMiddleware } from './auth/fake-auth.middleware';
 
 async function bootstrap() {
+  // New code
+  const port = process.env.PORT || 3001; 
+
   const app = await NestFactory.create(AppModule);
 
   const cookieParser = require('cookie-parser');
@@ -47,11 +50,9 @@ async function bootstrap() {
   //   console.log("Swagger API is ruuning at http://localhost:3001/api")
   // })
 
-  // New code
-  const port = process.env.PORT || 3001; 
+  app.setGlobalPrefix('api');
+
   await app.listen(port, '0.0.0.0'); // Adding '0.0.0.0' is important for Docker/Cloud environments
   console.log(`Server is running at http://localhost:${port}`)
-
-  app.setGlobalPrefix('api');
 }
 bootstrap();
