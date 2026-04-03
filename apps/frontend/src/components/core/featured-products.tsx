@@ -18,33 +18,44 @@ export function FeaturedProducts() {
   // Fetching from NestJS (limiting to 6 for the featured section)
   const { data: apiResponse, isLoading, error } = useProducts()
   const { addItem } = useCart()
-  
+
   // Track which products are being added to show individual loading states
   const [addingProducts, setAddingProducts] = useState<Set<number>>(new Set())
 
   const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
+    event.preventDefault();
+    event.stopPropagation();
 
-    setAddingProducts((prev) => new Set(prev).add(productData.id))
+    // 1. Loading state for this specific product
+    setAddingProducts((prev) => new Set(prev).add(productData.id));
 
     try {
+      // 2. Call the context addItem
+      // Ensure 'id' here is the actual Product UUID from your DB
       await addItem({
-        id: productData.id.toString(), // Cart context likely expects a string
-        name: productData.title,
+        id: productData.id, 
+        name: productData.title || productData.name,
         price: Number(productData.price),
         image: productData.image,
         quantity: 1,
-        handle: productData.handle,
-      })
+        handle: productData.handle || productData.slug,
+      });
+
+      // Optional: Add a toast notification here if you have one
+      // toast.success(`${productData.title} added to cart!`);
+
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      // toast.error("Could not add item to cart. Please try again.");
     } finally {
+      // 3. Remove loading state
       setAddingProducts((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(productData.id)
-        return newSet
-      })
+        const newSet = new Set(prev);
+        newSet.delete(productData.id);
+        return newSet;
+      });
     }
-  }
+  };
 
   if (isLoading) {
     return (

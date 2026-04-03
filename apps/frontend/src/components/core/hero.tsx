@@ -73,7 +73,8 @@ export function Hero() {
               {/* Simplified badge */}
               <Badge variant="outline" className="border-black text-black bg-transparent px-4 py-2 w-fit">
                 <Star className="w-4 h-4 mr-2 fill-black" />
-                {isShopifyConfigured ? "New Collection Available" : "Demo Store"}
+                {/* {isShopifyConfigured ? "New Collection Available" : "Demo Store"} */}
+                {isShopifyConfigured ? "Demo" : "New Collection Available"}
               </Badge>
 
               {/* Dynamic hero title */}
@@ -95,7 +96,7 @@ export function Hero() {
                 <p className="text-xl text-black/70 mb-8 max-w-lg leading-relaxed">
                   {isShopifyConfigured
                     ? "Discover amazing products that blend style, innovation, and quality."
-                    : "This is a demo storefront. Connect your Shopify store to see real products."}
+                    : "This is a demo storefront. Create your own store to feature new products."}
                 </p>
               </div>
 
