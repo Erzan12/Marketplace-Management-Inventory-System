@@ -2,6 +2,8 @@
 
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect, useCallback } from "react"
+import { useAuth } from "./auth-context"
+import { cartApi } from "@/lib/api-client"
 
 export interface CartItem {
   id: string // Product UUID from your Prisma schema
@@ -122,6 +124,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
+export function useCart() {
+  const context = useContext(CartContext)
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider")
+  }
+  return context
+}
+
 const CartContext = createContext<{
   state: CartState
   dispatch: React.Dispatch<CartAction>
@@ -133,8 +143,15 @@ const CartContext = createContext<{
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState)
+  const { isLoggedIn } = useAuth()
 
-  // Initialize cart from localStorage on mount
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+
+  const getHeaders = () => ({
+    "Content-Type": "application/json",
+  })
+
+  // Effect 1: Initialize from localStorage on mount
   useEffect(() => {
     const storedCart = localStorage.getItem("app_cart")
     if (storedCart) {
@@ -142,7 +159,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const items = JSON.parse(storedCart)
         dispatch({ type: "LOAD_CART", payload: items })
       } catch (error) {
-        console.error("Failed to parse cart from localStorage", error)
         dispatch({ type: "LOAD_CART", payload: [] })
       }
     } else {
@@ -150,26 +166,83 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Effect 2: Sync with backend when logged in
+  useEffect(() => {
+    const syncCartWithBackend = async () => {
+      if (!isLoggedIn) return
+
+      dispatch({ type: "SET_LOADING", payload: true })
+      try {
+        const res = await fetch(`${API_URL}/cart`, {
+          headers: getHeaders(),
+          credentials: "include", // ← sends the accessToken cookie
+        })
+        const responseData = await res.json()
+
+        const itemsArray = Array.isArray(responseData)
+          ? responseData
+          : responseData.data || []
+
+        const mappedItems: CartItem[] = itemsArray.map((item: any) => ({
+          id: item.product.id,
+          name: item.product.name,
+          price: Number(item.product.price),
+          image: item.product.images?.[0]?.url || "/placeholder.svg",
+          quantity: item.quantity,
+          handle: item.product.slug,
+        }))
+
+        dispatch({ type: "LOAD_CART", payload: mappedItems })
+        localStorage.setItem("app_cart", JSON.stringify(mappedItems))
+      } catch (error) {
+        console.error("Failed to sync cart with database", error)
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false })
+      }
+    }
+
+    syncCartWithBackend()
+  }, [isLoggedIn])
+
+  // Effect 3: Clear cart on logout
+  useEffect(() => {
+    if (!isLoggedIn) {
+      dispatch({ type: "CLEAR_CART" })
+    }
+  }, [isLoggedIn])
+
   const addItem = useCallback(async (item: CartItem) => {
     dispatch({ type: "SET_LOADING", payload: true })
     try {
+      if (isLoggedIn) {
+        await cartApi.addToCart(item.id, item.quantity)
+      }
       dispatch({ type: "ADD_ITEM", payload: item })
     } finally {
       dispatch({ type: "SET_LOADING", payload: false })
     }
-  }, [])
+  }, [isLoggedIn])
 
   const removeItem = useCallback(async (id: string) => {
+    if (isLoggedIn) {
+      await cartApi.removeFromCart(id)
+    }
     dispatch({ type: "REMOVE_ITEM", payload: id })
-  }, [])
+  }, [isLoggedIn])
 
   const updateItemQuantity = useCallback(async (id: string, quantity: number) => {
+    if (isLoggedIn) {
+      await cartApi.updateCartItem(id, quantity)
+    }
     dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } })
-  }, [])
+  }, [isLoggedIn])
 
   const clearCart = useCallback(async () => {
+    if (isLoggedIn) {
+      await cartApi.clearCart()
+    }
     dispatch({ type: "CLEAR_CART" })
-  }, [])
+  }, [isLoggedIn])
 
   return (
     <CartContext.Provider value={{ state, dispatch, addItem, removeItem, updateItemQuantity, clearCart }}>
@@ -178,10 +251,3 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function useCart() {
-  const context = useContext(CartContext)
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider")
-  }
-  return context
-}
