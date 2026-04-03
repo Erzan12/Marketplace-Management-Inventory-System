@@ -81,15 +81,34 @@ export const productsApi = {
 };
 
 // Cart API helpers
+// export const cartApi = {
+//   getCart: () => apiClient.get('/orders/my-cart'),
+//   addToCart: (productId: number, quantity: number) =>
+//     apiClient.post('/orders/my-cart', { productId, quantity }),
+//   updateCartItem: (productId: number, quantity: number) =>
+//     apiClient.patch('/orders/my-cart', { productId, quantity }),
+//   removeFromCart: (productId: number) =>
+//     apiClient.delete(`/orders/my-cart/${productId}`),
+//   clearCart: () => apiClient.delete('/orders/my-cart'),
+// };
+
 export const cartApi = {
-  getCart: () => apiClient.get('/orders/my-cart'),
-  addToCart: (productId: number, quantity: number) =>
-    apiClient.post('/orders/my-cart', { productId, quantity }),
-  updateCartItem: (productId: number, quantity: number) =>
-    apiClient.patch('/orders/my-cart', { productId, quantity }),
-  removeFromCart: (productId: number) =>
-    apiClient.delete(`/orders/my-cart/${productId}`),
-  clearCart: () => apiClient.delete('/orders/my-cart'),
+  // GET /cart
+  getCart: () => apiClient.get('/cart'),
+  
+  // POST /cart
+  addToCart: (productId: string, quantity: number) =>
+    apiClient.post('/cart', { productId, quantity }),
+    
+  // PATCH /cart
+  updateCartItem: (productId: string, quantity: number) =>
+    apiClient.patch('/cart', { productId, quantity }),
+    
+  // DELETE /cart/:id
+  removeFromCart: (productId: string) =>
+    apiClient.delete(`/cart/${productId}`),
+
+  clearCart: () => apiClient.delete('/cart'),
 };
 
 export default apiClient;
