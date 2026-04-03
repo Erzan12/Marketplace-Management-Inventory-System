@@ -133,7 +133,7 @@ export function Hero() {
               ) : productDetails ? (
                 // Real product showcase
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <Link href={`/product/${productDetails.handle}`}>
+                  <Link href={`/products/${productDetails.handle}`}>
                     <img
                       src={productDetails.image}
                       alt={productDetails.imageAlt}
@@ -147,7 +147,7 @@ export function Hero() {
                   {/* Product info */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Link href={`/product/${productDetails.handle}`}>
+                      <Link href={`/products/${productDetails.handle}`}>
                         <h3 className="font-semibold text-lg text-black hover:text-gray-600 transition-colors cursor-pointer line-clamp-1">
                           {productDetails.title}
                         </h3>

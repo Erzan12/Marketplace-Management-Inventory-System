@@ -63,6 +63,7 @@ export function ProductsPageClient() {
         name: product.name,
         price: product.price,
         image: product.images?.[0] || "/placeholder.svg",
+        quantity: product.quantity,
         handle: product.slug,
       })
     } finally {
@@ -184,7 +185,8 @@ export function ProductsPageClient() {
                   <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 h-full flex flex-col relative">
                     <CardContent className="p-0 flex flex-col h-full">
                       <div className="relative overflow-hidden">
-                        <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}>
+                        {/* <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}> */}
+                        <Link href={`/products/${productData.handle}`}>
                           <img
                             src={productData.image}
                             alt={productData.title}
@@ -217,7 +219,8 @@ export function ProductsPageClient() {
                       </div>
 
                       <div className="p-6 flex flex-col flex-grow">
-                        <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}>
+                        {/* <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}> */}
+                        <Link href={`/products/${productData.handle}`}>
                           <h3 className="font-semibold text-lg text-black mb-2 group-hover:text-gray-600 transition-colors cursor-pointer line-clamp-2 h-14 leading-7">
                             {productData.title}
                           </h3>
