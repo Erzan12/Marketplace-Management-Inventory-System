@@ -98,7 +98,7 @@ model Product {
   description String?
   price       Decimal @db.Decimal(10, 2)
   categoryId  String?  @db.Uuid
-  slug        String
+  slug        String  @unique
   storeId     String  @db.Uuid
   is_active   Boolean @default(true)
   status      ProductStatus  @default(DRAFT) // ACTIVE, DRAFT, ARCHIVED
