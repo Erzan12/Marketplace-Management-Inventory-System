@@ -2,6 +2,8 @@ import { Injectable, BadRequestException, NotFoundException } from "@nestjs/comm
 import { PrismaService } from "../../prisma/prisma.service";
 import { RESPONSE_MESSAGES } from "../../common/constants/response-messages.constant";
 import { successResponse } from "../../common/helpers/response-helper";
+import { AddCartDto } from "./dto/cart.dto";
+import { RequestUser } from "../../shared/types/request-user.interface";
 
 @Injectable()
 export class CartService {
@@ -15,46 +17,58 @@ export class CartService {
     });
     }
 
-    async addToCart(userId: string, productId: string, quantity: number) {
-        console.log('Adding to cart:', { userId, productId, quantity }); // Debug log
+    async addToCart(requestUser: RequestUser, dto: AddCartDto) {
+        const { productId, quantity } = dto;
 
-        const product = await this.prisma.inventory.findUnique({
+        console.log('Adding to cart:', { productId, quantity }); // Debug log
+
+        const product = await this.prisma.product.findFirst({
             where: { id: productId },
             include: {
-                product: {
+                inventory: {
                     select: {
                         id: true,
-                        name: true,
+                        product: true,
+                        quantity: true,
                     }
                 }
             }
         });
 
-        if (!product) {
-            throw new NotFoundException('Product not found');
+        
+        if (!product?.inventory) {
+        throw new BadRequestException('Product has no inventory record');
         }
+
+        const userId = requestUser.id;
 
         const existing = await this.prisma.cartItem.findUnique({
             where: { userId_productId: { userId, productId } },
         });
 
+
+        const availableStock = product.inventory.quantity;
+
         const totalRequestedQuantity = (existing?.quantity || 0) + quantity;
 
-        if (totalRequestedQuantity > product.quantity) {
+        if (totalRequestedQuantity > availableStock) {
             throw new BadRequestException(
-                `Cannot add ${quantity} of "${product.product.name}". Only ${product.quantity} left in stock.`
+                `Cannot add ${quantity} of "${product.name}". Only ${availableStock} left in stock.`
             );
         }
 
-        // if (existing) {
-        //     return this.prisma.cartItem.update({
-        //         where: { userId_productId: { userId, productId } },
-        //         data: { quantity: existing.quantity + quantity },
-        //     });
-        // }
-
-        return this.prisma.cartItem.create({
-            data: { userId, productId, quantity },
+        return this.prisma.cartItem.upsert({
+            where: { userId_productId: { userId, productId } },
+            update: { quantity: { increment: quantity } },
+            create: {
+                user: {
+                connect: { id: requestUser.id },
+                },
+                product: {
+                connect: { id: productId },
+                },
+                quantity,
+            },
         });
     }
 
@@ -107,5 +121,13 @@ export class CartService {
         });
 
         return successResponse(RESPONSE_MESSAGES.CART.ITEM_REMOVED, deleted);
+    }
+
+    async clearCart(userId: string) {
+        const result = await this.prisma.cartItem.deleteMany({
+            where: { userId },
+        });
+
+        return successResponse('Cart cleared successfully', { count: result.count });
     }
 }
