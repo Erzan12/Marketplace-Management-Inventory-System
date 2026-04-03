@@ -72,6 +72,7 @@ export const authApi = {
 export const productsApi = {
   getAll: () => apiClient.get('/products'),
   getById: (id: number) => apiClient.get(`/products/${id}`),
+  getBySlug: (slug: string) => apiClient.get(`/products/slug/${slug}`),
   create: (data: { name: string; description?: string; price: number; quantity: number; categoryId?: number }) =>
     apiClient.post('/products', data),
   update: (id: number, data: Partial<{ name: string; description: string; price: number; quantity: number; categoryId: number }>) =>
