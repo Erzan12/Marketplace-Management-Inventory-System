@@ -82,7 +82,7 @@ export const productsApi = {
 
 // Cart API helpers
 export const cartApi = {
-  getCart: () => apiClient.get('api/orders/my-cart'),
+  getCart: () => apiClient.get('/orders/my-cart'),
   addToCart: (productId: number, quantity: number) =>
     apiClient.post('/orders/my-cart', { productId, quantity }),
   updateCartItem: (productId: number, quantity: number) =>

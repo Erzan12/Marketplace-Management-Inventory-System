@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 // Replace the shopify hook with your new NestJS hook
 import { useProducts } from "@/hooks/useProducts" 
+import { useProduct } from "@/hooks/useProduct"
+import { useParams } from "next/navigation"
 
 export function FeaturedProducts() {
   // Fetching from NestJS (limiting to 6 for the featured section)
@@ -20,25 +22,25 @@ export function FeaturedProducts() {
   // Track which products are being added to show individual loading states
   const [addingProducts, setAddingProducts] = useState<Set<number>>(new Set())
 
-  const handleAddToCart = async (product: any, event: React.MouseEvent) => {
+  const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
 
-    setAddingProducts((prev) => new Set(prev).add(product.id))
+    setAddingProducts((prev) => new Set(prev).add(productData.id))
 
     try {
       await addItem({
-        id: product.id.toString(), // Cart context likely expects a string
-        name: product.name,
-        price: product.price,
-        image: product.images?.[0] || "/placeholder.svg",
-        quantity: product.quantity,
-        handle: product.slug,
+        id: productData.id.toString(), // Cart context likely expects a string
+        name: productData.title,
+        price: Number(productData.price),
+        image: productData.image,
+        quantity: 1,
+        handle: productData.handle,
       })
     } finally {
       setAddingProducts((prev) => {
         const newSet = new Set(prev)
-        newSet.delete(product.id)
+        newSet.delete(productData.id)
         return newSet
       })
     }
@@ -140,14 +142,15 @@ export function FeaturedProducts() {
                         <Button
                           type="button"
                           className="w-full bg-black text-white hover:bg-black/90"
-                          onClick={(e) => handleAddToCart(product, e)}
+                          onClick={(e) => handleAddToCart(productData, e)}
                           disabled={!productData.available || isAddingThisProduct}
                         >
                           {isAddingThisProduct ? (
                             <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          ) : (
-                            "Add to Cart"
+                          ) :  (
+                            <ShoppingCart className="w-4 h-4 mr-2" />
                           )}
+                          {productData.available ? "Add to Cart" : "Out of Stock"}
                         </Button>
                       </div>
                     </div>

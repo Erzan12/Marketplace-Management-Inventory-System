@@ -52,24 +52,24 @@ export function ProductsPageClient() {
 
  
   
-  const handleAddToCart = async (product: any, event: React.MouseEvent) => {
+  const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
 
-    setAddingProducts((prev) => new Set(prev).add(product.id))
+    setAddingProducts((prev) => new Set(prev).add(productData.id))
     try {
       await addItem({
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price,
-        image: product.images?.[0] || "/placeholder.svg",
-        quantity: product.quantity,
-        handle: product.slug,
+        id: productData.id.toString(), // Cart context likely expects a string
+        name: productData.title,
+        price: Number(productData.price),
+        image: productData.image,
+        quantity: 1,
+        handle: productData.handle,
       })
     } finally {
       setAddingProducts((prev) => {
         const newSet = new Set(prev)
-        newSet.delete(product.id)
+        newSet.delete(productData.id)
         return newSet
       })
     }
@@ -257,7 +257,12 @@ export function ProductsPageClient() {
                             onClick={(e) => handleAddToCart(productData, e)}
                             disabled={!productData.available || isAddingThisProduct}
                           >
-                            {isAddingThisProduct ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Add to Cart"}
+                            {isAddingThisProduct ? (
+                              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            ) : (
+                              <ShoppingCart className="w-4 h-4 mr-2" />
+                            )}
+                            {productData.available ? "Add to Cart" : "Out of Stock"}
                           </Button>
                         </div>
                       </div>
