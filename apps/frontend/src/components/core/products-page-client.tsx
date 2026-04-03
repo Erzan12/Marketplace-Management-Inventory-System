@@ -92,8 +92,6 @@ export function ProductsPageClient() {
     )
   }
 
-  
-
   const products = apiResponse?.data || []
   const meta = apiResponse?.meta // Accessing totalItems, lastPage, etc.
 
@@ -169,16 +167,30 @@ export function ProductsPageClient() {
             {products.map((product) => {
               // Check if this specific product is being added
               const isAddingThisProduct = addingProducts.has(product.id)
+              // Map NestJS data to the UI structure
+            const productData = {
+              id: product.id,
+              title: product.name,
+              description: product.description,
+              price: product.price,
+              image: product.images?.[0]?.url || "/placeholder.svg",
+              handle: product.slug,
+              available: (product.inventory?.quantity ?? 0) > 0,
+              category: product.category?.name,
+            }
 
               return (
-                <div key={product.id} className="h-full">
+                <div key={productData.id} className="h-full">
                   <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 h-full flex flex-col relative">
                     <CardContent className="p-0 flex flex-col h-full">
                       <div className="relative overflow-hidden">
-                        <Link href={isAddingThisProduct ? `/product/${product.handle}` : "#"}>
+                        <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}>
                           <img
-                            src={product.image?.[0] || "/placeholder.svg"}
-                            alt={product.imageAlt}
+                            src={productData.image}
+                            alt={productData.title}
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg";
+                            }}
                             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                           />
                         </Link>
@@ -191,8 +203,8 @@ export function ProductsPageClient() {
                           <Button
                             type="button"
                             className="bg-white text-black hover:bg-gray-100 border border-gray-200"
-                            onClick={(e) => handleAddToCart(product, e)}
-                            disabled={!product.quantity || isAddingThisProduct}
+                            onClick={(e) => handleAddToCart(productData, e)}
+                            disabled={!productData.available || isAddingThisProduct}
                           >
                             {isAddingThisProduct ? (
                               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -205,14 +217,14 @@ export function ProductsPageClient() {
                       </div>
 
                       <div className="p-6 flex flex-col flex-grow">
-                        <Link href={isAddingThisProduct ? `/product/${product.handle}` : "#"}>
+                        <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}>
                           <h3 className="font-semibold text-lg text-black mb-2 group-hover:text-gray-600 transition-colors cursor-pointer line-clamp-2 h-14 leading-7">
-                            {product.name}
+                            {productData.title}
                           </h3>
                         </Link>
 
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10 leading-5">
-                          {product.description}
+                          {productData.description}
                         </p>
 
                         {/* <div className="flex items-center gap-2 mb-4 h-8">
@@ -232,15 +244,15 @@ export function ProductsPageClient() {
                           )}
                         </div> */}
                         <div className="flex items-center gap-2 mb-4 h-8">
-                          <span className="text-2xl font-bold text-black">${Number(product.price).toFixed(2)}</span>
+                          <span className="text-2xl font-bold text-black">${Number(productData.price).toFixed(2)}</span>
                         </div>
 
                         <div className="mt-auto">
                           <Button
                             type="button"
                             className="w-full bg-black text-white hover:bg-black/90"
-                            onClick={(e) => handleAddToCart(product, e)}
-                            disabled={!product.quantity || isAddingThisProduct}
+                            onClick={(e) => handleAddToCart(productData, e)}
+                            disabled={!productData.available || isAddingThisProduct}
                           >
                             {isAddingThisProduct ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Add to Cart"}
                           </Button>

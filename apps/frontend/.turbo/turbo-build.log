@@ -6,3 +6,97 @@
    - Environments: .env.local
 
    Creating an optimized production build ...
+
+
+Retrying 1/3...
+ ✓ Compiled successfully in 14.0s
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./src/app/login/page.tsx
+69:13  Error: 'response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+75:21  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+178:18  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/app/sign-up/page.tsx
+10:22  Error: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/cart-drawer.tsx
+83:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/component-example.tsx
+84:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/categories.tsx
+22:40  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:33  Error: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+117:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/featured-products.tsx
+10:10  Error: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+23:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+101:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/hero.tsx
+16:41  Error: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+26:9  Warning: The 'products' logical expression could make the dependencies of useMemo Hook (at line 33) change on every render. To fix this, wrap the initialization of 'products' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+137:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+182:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/navbar.tsx
+21:10  Error: 'showDropdown' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:13  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+66:13  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+157:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./src/components/core/product-page-client.tsx
+42:63  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+99:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+117:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/products-page-client.tsx
+55:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+179:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/core/setup/setup-tooltip.tsx
+15:10  Error: 'parsedDomain' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+118:30  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+239:88  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+239:111  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./src/components/core/setup/setup-wizard.tsx
+14:10  Error: 'hasStore' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+90:55  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+102:32  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+139:62  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+220:47  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+257:90  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+257:105  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./src/components/ui/chart.tsx
+72:7  Error: '_' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ui/use-toast.ts
+18:7  Error: 'actionTypes' is assigned a value but only used as a type.  @typescript-eslint/no-unused-vars
+
+./src/contexts/cart-context.tsx
+102:19  Error: 'name' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+102:25  Error: 'price' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+102:32  Error: 'image' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+102:39  Error: 'handle' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+315:21  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useProducts.ts
+5:9  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/shopify/shopify.ts
+116:30  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+117:33  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path D:\Earl Projects\Projects\Product-Inventory-System\apps\frontend
+npm error workspace product-inventory-frontend@0.1.0
+npm error location D:\Earl Projects\Projects\Product-Inventory-System\apps\frontend

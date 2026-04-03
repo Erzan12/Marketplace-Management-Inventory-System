@@ -38,17 +38,17 @@ export function Hero() {
 
     // 1. Data Mapping for your custom DB (NestJS)
     // Based on your JSON: { id, name, price, images: [url], slug, quantity }
-    const title = featuredProduct.name
-    const price = featuredProduct.price
-    const image = featuredProduct.images?.[0] // Usually a string array in your DB
-    const handle = featuredProduct.slug
-    const available = featuredProduct.quantity > 0
+    const title = featuredProduct.name;
+    const price = Number(featuredProduct.price);
+    const image = featuredProduct.images?.[0]?.url; // Usually a string array in your DB
+    const handle = featuredProduct.slug;
+    const available = (featuredProduct.inventory?.quantity ?? 0) > 0;
 
     // 2. Logic for Discount (If your DB has a compareAtPrice field)
     // If you haven't added compareAtPrice to your NestJS schema yet, 
     // hasDiscount will just be false.
-    const compareAtPrice = featuredProduct.compareAtPrice || null 
-    const hasDiscount = !!(compareAtPrice && compareAtPrice > price)
+    const compareAtPrice = featuredProduct.compareAtPrice || null; 
+    const hasDiscount = !!(compareAtPrice && compareAtPrice > price);
 
     return {
       title,
@@ -135,8 +135,11 @@ export function Hero() {
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                   <Link href={`/product/${productDetails.handle}`}>
                     <img
-                      src={productDetails.image || "/placeholder.svg"}
+                      src={productDetails.image}
                       alt={productDetails.imageAlt}
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
                       className="w-full h-80 object-cover rounded-lg mb-4 cursor-pointer hover:opacity-90 transition-opacity duration-300"
                     />
                   </Link>

@@ -79,17 +79,16 @@ export function FeaturedProducts() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => {
-            const isAddingThisProduct = addingProducts.has(product.id)
-            
-            // Map your NestJS data to the UI structure
+            const isAddingThisProduct = addingProducts.has(product.id)  
+            // Map NestJS data to the UI structure
             const productData = {
               id: product.id,
               title: product.name,
               price: product.price,
-              image: product.images?.[0] || "/placeholder.svg",
+              image: product.images?.[0]?.url || "/placeholder.svg",
               handle: product.slug,
-              available: product.quantity > 0,
-              category: product.category?.name
+              available: (product.inventory?.quantity ?? 0) > 0,
+              category: product.category?.name,
             }
 
             return (
@@ -99,7 +98,7 @@ export function FeaturedProducts() {
                     <div className="relative overflow-hidden">
                       <Link href={`/product/${productData.handle}`}>
                         <img
-                          src={productData.image}
+                          src={productData.image || "/placeholder.svg"}
                           alt={productData.title}
                           className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                         />
@@ -109,7 +108,7 @@ export function FeaturedProducts() {
                         <Button
                           type="button"
                           className="bg-white text-black hover:bg-gray-100 border border-gray-200"
-                          onClick={(e) => handleAddToCart(product, e)}
+                          onClick={(e) => handleAddToCart(productData, e)}
                           disabled={!productData.available || isAddingThisProduct}
                         >
                           {isAddingThisProduct ? (
