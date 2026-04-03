@@ -157,7 +157,26 @@ export class ProductService {
         where: whereCondition,
         skip,
         take: Number(limit),
-        include: { category: true },
+        include: { 
+          category: {
+            select: {
+              id: true,
+              name: true,
+              is_active: true,
+            }
+          }, 
+          images: {
+            select: {
+              url: true,
+              productId: true,
+            }
+          }, 
+          inventory: {
+            select: {
+              quantity: true,
+              productId: true,
+            }
+          } },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.product.count({ where: whereCondition }),
