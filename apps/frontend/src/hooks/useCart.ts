@@ -10,7 +10,7 @@ export const useCart = () => {
     return useQuery<CartItem[]>({
         queryKey: ['cart'],
         queryFn: async () => {
-            const res = await apiClient.get('/orders/my-cart');
+            const res = await apiClient.get('/cart');
             return res.data;
         },
         enabled: !!token
