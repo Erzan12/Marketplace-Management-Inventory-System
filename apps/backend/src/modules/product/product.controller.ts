@@ -21,10 +21,13 @@ export class ProductController {
   async getProducts(@Query() query: GetProductsQueryDto) {
     return this.productService.findAll(query);
   }
-  // @Get()
-  // findAll() {
-  //   return this.productService.findAll();
-  // }
+
+  // IMPORTANT: SLUG ROUTE FIRST
+  @Public()
+  @Get('slug/:slug')
+  findOneBySlug(@Param('slug') slug: string) {
+    return this.productService.findOneBySlug(slug);
+  }
 
   // Public - Anyone can view a single product
   @Public()

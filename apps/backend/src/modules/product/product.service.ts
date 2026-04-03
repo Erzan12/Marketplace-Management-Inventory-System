@@ -199,6 +199,28 @@ export class ProductService {
     });
   }
 
+  async findOneBySlug(slug: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        compareAtPrice: true,
+        slug: true,
+        images: { select: { url: true } },
+        inventory: { select: { quantity: true } },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
+  }
+
   async update(id: string, data: UpdateProductDto) {
     return this.prisma.product.update({
        where: { id },
