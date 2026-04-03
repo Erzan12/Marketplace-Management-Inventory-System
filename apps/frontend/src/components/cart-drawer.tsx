@@ -7,14 +7,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 
 export function CartDrawer() {
-  const { state, dispatch, removeItem, updateItemQuantity, clearShopifyCart } = useCart()
+  const { state, dispatch, removeItem, updateItemQuantity, clearCart } = useCart()
 
-  const handleUpdateQuantity = (cartLineId: string, quantity: number) => {
-    updateItemQuantity(cartLineId, quantity)
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    updateItemQuantity(id, quantity)
   }
 
-  const handleRemoveItem = (cartLineId: string) => {
-    removeItem(cartLineId)
+  const handleRemoveItem = (id: string) => {
+    removeItem(id)
   }
 
   const closeCart = () => {
@@ -77,7 +77,7 @@ export function CartDrawer() {
                 <div className="space-y-4">
                   {state.items.map((item) => (
                     <div
-                      key={item.cartLineId || item.id}
+                      key={item.id}
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg"
                     >
                       <img
@@ -90,13 +90,14 @@ export function CartDrawer() {
                         <Link href={`/product/${item.handle}`} onClick={closeCart}>
                           <h3 className="font-medium text-black hover:text-gray-600 transition-colors">{item.name}</h3>
                         </Link>
-                        <p className="text-sm text-gray-500">${item.price.toFixed(2)}</p>
+                        {/* Coerce back to Number safely */}
+                        <p className="text-sm text-gray-500">${Number(item.price).toFixed(2)}</p>
 
                         <div className="flex items-center gap-2 mt-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => item.cartLineId && handleUpdateQuantity(item.cartLineId, item.quantity - 1)}
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                             className="w-8 h-8 p-0 border-gray-300"
                             disabled={state.loading}
                           >
@@ -108,7 +109,7 @@ export function CartDrawer() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => item.cartLineId && handleUpdateQuantity(item.cartLineId, item.quantity + 1)}
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                             className="w-8 h-8 p-0 border-gray-300"
                             disabled={state.loading}
                           >
@@ -118,11 +119,11 @@ export function CartDrawer() {
                       </div>
 
                       <div className="text-right">
-                        <p className="font-medium text-black">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-medium text-black">${(Number(item.price) * item.quantity).toFixed(2)}</p>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => item.cartLineId && handleRemoveItem(item.cartLineId)}
+                          onClick={() => handleRemoveItem(item.id)}
                           className="text-red-500 hover:text-red-700 mt-1"
                           disabled={state.loading}
                         >
@@ -140,18 +141,18 @@ export function CartDrawer() {
               <div className="border-t border-gray-200 p-6 space-y-4">
                 <div className="flex justify-between items-center text-lg font-semibold">
                   <span>Total:</span>
-                  <span>${state.total.toFixed(2)}</span>
+                  <span>${Number(state.total).toFixed(2)}</span>
                 </div>
 
                 <div className="space-y-2">
                   <Button
                     asChild
                     className="w-full bg-black text-white hover:bg-black/90"
-                    disabled={state.loading || !state.checkoutUrl}
+                    disabled={state.loading}
                   >
-                    <a href={state.checkoutUrl || "#"} target="_blank" rel="noopener noreferrer">
+                    <Link href="/checkout" onClick={closeCart}>
                       Checkout
-                    </a>
+                    </Link>
                   </Button>
                   <Button
                     variant="outline"
@@ -164,7 +165,7 @@ export function CartDrawer() {
                   <Button
                     variant="ghost"
                     className="w-full text-red-500 hover:text-red-700"
-                    onClick={clearShopifyCart}
+                    onClick={clearCart}
                     disabled={state.loading}
                   >
                     Clear Cart
