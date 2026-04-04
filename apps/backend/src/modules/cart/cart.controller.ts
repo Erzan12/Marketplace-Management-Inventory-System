@@ -1,6 +1,6 @@
-import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException } from '@nestjs/common';
+import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException, ParseUUIDPipe } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
-import { AddCartDto } from './dto/cart.dto';
+import { AddCartDto, UpdateCartDto } from './dto/cart.dto';
 import { RequestUser } from '../../shared/types/request-user.interface';
 import { SessionUser } from '../../shared/types/session-user.decorator';
 
@@ -11,7 +11,7 @@ export class CartController {
     @Post() // Logic: POST /cart
     addToCart(
         @SessionUser() user: RequestUser,
-        @Body() dto: AddCartDto
+        @Body() dto: AddCartDto,
     ) {
         return this.cartService.addToCart(user, dto);
     }
@@ -19,6 +19,15 @@ export class CartController {
     @Get() // Logic: GET /cart
     viewCart(@Request() req) {
         return this.cartService.viewCart(req.user.userId);
+    }
+
+    @Patch('/:productId')
+    updateCart(
+        @SessionUser() user: RequestUser,
+        @Body() dto: UpdateCartDto,
+        @Param('productId', new ParseUUIDPipe()) productId: string,
+    ) {
+        return this.cartService.updateQuantity(user, dto, productId);
     }
 
     // Use Param for Delete to match common REST patterns

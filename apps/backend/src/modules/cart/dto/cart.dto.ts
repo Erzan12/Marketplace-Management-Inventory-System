@@ -14,3 +14,11 @@ export class AddCartDto {
     })
     quantity!: number;
 }
+
+export class UpdateCartDto {
+    @IsInt()
+    @ApiProperty({
+        example: "quantity"
+    })
+    quantity!: number;
+}

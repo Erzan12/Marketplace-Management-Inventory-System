@@ -102,12 +102,13 @@ export const cartApi = {
     
   // PATCH /cart
   updateCartItem: (productId: string, quantity: number) =>
-    apiClient.patch('/cart', { productId, quantity }),
+    apiClient.patch(`/cart/${productId}`, { quantity }),
     
   // DELETE /cart/:id
   removeFromCart: (productId: string) =>
     apiClient.delete(`/cart/${productId}`),
 
+  // Clear cart product
   clearCart: () => apiClient.delete('/cart'),
 };
 

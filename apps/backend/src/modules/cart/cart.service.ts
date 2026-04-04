@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from "@nestjs/comm
 import { PrismaService } from "../../prisma/prisma.service";
 import { RESPONSE_MESSAGES } from "../../common/constants/response-messages.constant";
 import { successResponse } from "../../common/helpers/response-helper";
-import { AddCartDto } from "./dto/cart.dto";
+import { AddCartDto, UpdateCartDto } from "./dto/cart.dto";
 import { RequestUser } from "../../shared/types/request-user.interface";
 
 @Injectable()
@@ -37,7 +37,7 @@ export class CartService {
 
         
         if (!product?.inventory) {
-        throw new BadRequestException('Product has no inventory record');
+            throw new BadRequestException('Product has no inventory record');
         }
 
         const userId = requestUser.id;
@@ -46,6 +46,9 @@ export class CartService {
             where: { userId_productId: { userId, productId } },
         });
 
+        if (!existing) {
+            throw new NotFoundException(RESPONSE_MESSAGES.CART.ITEM_NOT_FOUND);
+        }
 
         const availableStock = product.inventory.quantity;
 
@@ -72,23 +75,30 @@ export class CartService {
         });
     }
 
-    async updateQuantity(userId: string, productId: string, quantity: number) {
+    async updateQuantity(requestUser: RequestUser, dto: UpdateCartDto, productId: string) {
+
+        const { quantity } = dto;
+
+       console.log('Updating cart quantity:', { productId, quantity });
         
-        const product = await this.prisma.inventory.findUnique({
+        const product = await this.prisma.product.findFirst({
             where: { id: productId },
             include: {
-                product: {
+                inventory: {
                     select: {
                         id: true,
-                        name: true,
+                        product: true,
+                        quantity: true,
                     }
                 }
             }
         });
 
-        if (!product) {
-            throw new NotFoundException('Product not found');
+        if (!product?.inventory) {
+            throw new BadRequestException('Product has no inventory record');
         }
+
+        const userId = requestUser.id;
 
         const existing = await this.prisma.cartItem.findUnique({
             where: { userId_productId: { userId, productId } },
@@ -98,11 +108,11 @@ export class CartService {
             throw new NotFoundException(RESPONSE_MESSAGES.CART.ITEM_NOT_FOUND);
         }
 
-        if (quantity > product.quantity) {
+        if (quantity > product.inventory.quantity) {
         throw new BadRequestException(
             RESPONSE_MESSAGES.CART.INSUFFICIENT_STOCK(
-            product.product.name,
-            product.quantity,
+            product.name,
+            product.inventory.quantity,
             quantity
             )
         );
