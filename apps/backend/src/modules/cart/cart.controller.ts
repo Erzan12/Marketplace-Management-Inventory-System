@@ -31,8 +31,17 @@ export class CartController {
     }
 
     // Use Param for Delete to match common REST patterns
-    @Delete(':productId') // Logic: DELETE /cart/:productId
-    removeFromCart(@Request() req, @Param('productId') productId: string) {
-        return this.cartService.removeFromCart(req.user.userId, productId);
+    @Delete('/:productId') // Logic: DELETE /cart/:productId
+    removeFromCart(
+        @SessionUser() user: RequestUser,
+        @Param('productId', new ParseUUIDPipe()) productId: string) {
+        return this.cartService.removeFromCart(user, productId);
+    }
+
+    @Delete()
+    clearCart(
+        @SessionUser() user: RequestUser,
+    ) {
+        return this.cartService.clearCart(user);
     }
 }
