@@ -17,7 +17,7 @@ export function Navbar() {
   const { state, dispatch } = useCart()
 
   // Handle logout
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
@@ -40,6 +40,8 @@ export function Navbar() {
 
   // Get dynamic store name
   const storeName = "ShopStack";
+
+  const isAdmin = user?.role === "admin"
 
   // Function to scroll to categories section
   const scrollToCategories = () => {
@@ -101,7 +103,6 @@ export function Navbar() {
               )}
             </Button>
 
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="hidden md:flex">
@@ -128,6 +129,12 @@ export function Navbar() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile">Profile</Link>
                     </DropdownMenuItem>
+                    {/* ✅ ADMIN ONLY */}
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin">Admin Dashboard</Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem 
                       className="text-red-600 focus:text-red-600 cursor-pointer" 
                       onClick={handleLogout}

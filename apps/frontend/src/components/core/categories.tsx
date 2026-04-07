@@ -4,11 +4,24 @@ import { Shirt, Watch, Headphones, Gamepad2, Camera, Coffee, Package, Star } fro
 import { Badge } from "@/components/ui/badge"
 import { useCollections } from "@/hooks/shopify/use-shopify"
 import { ShopifyCollection } from "@/lib/shopify/shopify"
+import apiClient from "@/lib/api-client"
+import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
+
+type Category = {
+  id: string
+  name?: string
+  title?: string
+  slug?: string
+  handle?: string
+  icon?: any
+}
+
 
 const defaultIcons = [Shirt, Watch, Headphones, Gamepad2, Camera, Coffee, Package, Star]
 
 // Placeholder categories for when Shopify is not configured
-const placeholderCategories = [
+const placeholderCategories: Category[] = [
   { id: "1", title: "Electronics", handle: "electronics", icon: Headphones },
   { id: "2", title: "Fashion", handle: "fashion", icon: Shirt },
   { id: "3", title: "Accessories", handle: "accessories", icon: Watch },
@@ -24,28 +37,15 @@ function isShopifyCollection(category: any): category is ShopifyCollection {
 }
 
 export function Categories() {
-  const { collections, loading, error } = useCollections()
+  // 1. Fetch from your NestJS API
+  const { data: categories, isLoading } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: () => apiClient.get('/categories').then(res => res.data)
+  })
 
-  // Check if Shopify is configured
-  const isShopifyConfigured = !!process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
-
-  // Show loading only for configured stores
-  if (loading && isShopifyConfigured) {
-    return (
-      <section id="categories-section" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading collections...</p>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  // Determine which categories to show
-  const categoriesToShow =
-    isShopifyConfigured && collections.length > 0 ? collections.slice(0, 8) : placeholderCategories
+  // 2. Logic to decide what to show
+  const hasRealCategories = categories && categories.length > 0
+  const categoriesToShow = hasRealCategories ? categories.slice(0, 8) : placeholderCategories
 
   return (
     <section id="categories-section" className="py-20 bg-gray-50">
@@ -53,78 +53,35 @@ export function Categories() {
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">Shop by Category</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {isShopifyConfigured && collections.length > 0
-              ? "Explore our curated collections from your store"
-              : "Sample categories - connect your Shopify store to see real collections"}
+            {hasRealCategories 
+              ? "Explore our curated collections" 
+              : "Discover our upcoming collections"}
           </p>
-          {!isShopifyConfigured && (
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 mt-2">
-              Demo Mode
-            </Badge>
-          )}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {categoriesToShow.map((category, index) => {
-            // Handle both real collections and placeholder categories
-            const isRealCollection = isShopifyConfigured && collections.length > 0
+            // use both in const slug
+            const slug = category.slug || category.handle
 
-            let IconComponent
-            let categoryData
-
-            if (isShopifyCollection(category)) {
-              IconComponent = defaultIcons[index % defaultIcons.length]
-              categoryData = {
-                id: category.id,
-                title: category.title,
-                handle: category.handle,
-                image: category.image?.url,
-                imageAlt: category.image?.altText,
-              }
-            } else {
-              IconComponent = category.icon
-              categoryData = {
-                id: category.id,
-                title: category.title,
-                handle: category.handle,
-                image: null,
-                imageAlt: null,
-              }
-            }
+            const Icon =
+              "icon" in category
+                ? category.icon // from placeholderCategories
+                : defaultIcons[index % defaultIcons.length] // fallback for DB categories
 
             return (
-              <a
-                key={categoryData.id}
-                href={isRealCollection ? `/products?collection=${categoryData.handle}` : "#"}
+              <Link
+                key={category.id}
+                href={`/products?category=${slug}`}
                 className="group cursor-pointer"
-                onClick={
-                  !isRealCollection
-                    ? (e) => {
-                        e.preventDefault()
-                        alert("This is a demo. Connect your Shopify store to browse real collections!")
-                      }
-                    : undefined
-                }
               >
-                <div className="bg-white border border-gray-200 rounded-lg p-8 text-center hover:border-black transition-all duration-300 relative">
-                  {!isShopifyConfigured && (
-                    <Badge variant="secondary" className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs">
-                      Demo
-                    </Badge>
-                  )}
-
-                  {categoryData.image ? (
-                    <img
-                      src={categoryData.image || "/placeholder.svg"}
-                      alt={categoryData.imageAlt || categoryData.title}
-                      className="w-12 h-12 mx-auto mb-4 rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  ) : (
-                    <IconComponent className="w-12 h-12 mx-auto mb-4 text-black group-hover:scale-110 transition-transform duration-300" />
-                  )}
-                  <h3 className="font-semibold text-lg text-black">{categoryData.title}</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-8 text-center hover:border-black transition-all duration-300">
+                  <Icon className="w-12 h-12 mx-auto mb-4 text-black group-hover:scale-110 transition-transform duration-300" />
+                  <h3 className="font-semibold text-lg text-black">
+                    {category.name || category.title}
+                  </h3>
                 </div>
-              </a>
+              </Link>
             )
           })}
         </div>

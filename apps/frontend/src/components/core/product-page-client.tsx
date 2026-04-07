@@ -1,29 +1,29 @@
 "use client"
 
 import type React from "react"
-
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 import { ShoppingCart, Truck, Shield, RotateCcw, ArrowLeft, Loader2 } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
-import { useProducts } from "@/hooks/shopify/use-shopify"
-
-// interface ProductPageClientProps {
-//   productHandle: string
-// }
+import { useParams } from "next/navigation"
+import { useProduct, type ProductImage } from "@/hooks/useProduct"
 
 export function ProductPageClient() {
-  const { product, loading, error } = useProducts()
+  const params = useParams();
+  const slug = params.slug as string;
+  const { data: product, isLoading, error } = useProduct(slug)
   const { addItem, state: cartState } = useCart()
+  
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState("description")
-  // Track if this product is being added to cart
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
 
-  if (loading || cartState.loading) {
+  // Using String for the Set because your Prisma ID is a UUID string
+  const [addingProducts, setAddingProducts] = useState<Set<string>>(new Set())
+
+  if (isLoading || cartState.loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -39,7 +39,7 @@ export function ProductPageClient() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-black mb-4">Product Not Found</h1>
-          <p className="text-gray-600 mb-6">This product doesn't exist in your Shopify store</p>
+          <p className="text-gray-600 mb-6">This product doesn't exist in the store.</p>
           <Link href="/">
             <Button className="bg-black text-white hover:bg-black/90">Return Home</Button>
           </Link>
@@ -48,36 +48,36 @@ export function ProductPageClient() {
     )
   }
 
-  const variant = product.variants.edges[0]?.node
-  const images = product.images.edges.map((edge) => edge.node)
-  const price = variant ? Number.parseFloat(variant.price.amount) : 0
-  const compareAtPrice = product.compareAtPriceRange.minVariantPrice.amount
-  const hasDiscount = compareAtPrice && Number.parseFloat(compareAtPrice) > price
-  const discount = hasDiscount
-    ? Math.round(((Number.parseFloat(compareAtPrice) - price) / Number.parseFloat(compareAtPrice)) * 100)
-    : 0
+  const images = product.images || [];
+  const price = Number(product.price);
+  const compareAtPrice = product.compareAtPrice ? Number(product.compareAtPrice) : null;
+  const hasDiscount = !!(compareAtPrice && compareAtPrice > price);
+  const discount = hasDiscount ? Math.round(((compareAtPrice! - price) / compareAtPrice!) * 100) : 0;
+  const available = (product.inventory?.quantity ?? 0) > 0;
+  
+  // Deriving isAddingToCart from the Set
+  const isAddingToCart = addingProducts.has(product.id);
 
-  const handleAddToCart = async (event: React.FormEvent) => {
-    // Prevent form submission and page reload
-    event.preventDefault()
+  const handleAddToCart = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setAddingProducts((prev) => new Set(prev).add(product.id))
 
-    if (variant) {
-      setIsAddingToCart(true)
-
-      try {
-        await addItem(
-          {
-            id: variant.id,
-            name: product.title,
-            price: price,
-            image: images[0]?.url || "/placeholder.svg",
-            handle: product.handle,
-          },
-          quantity,
-        )
-      } finally {
-        setIsAddingToCart(false)
-      }
+    try {
+      await addItem({
+        id: product.id,
+        name: product.name,
+        price: price,
+        image: product.images?.[0]?.url || "/placeholder.svg",
+        handle: product.slug,
+        quantity: quantity // Don't forget to pass your selected quantity!
+      });
+    } finally {
+      setAddingProducts((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(product.id)
+        return newSet
+      })
     }
   }
 
@@ -97,15 +97,18 @@ export function ProductPageClient() {
           <div className="space-y-4">
             <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
               <img
-                src={images[selectedImage]?.url || "/placeholder.svg?height=500&width=500"}
-                alt={images[selectedImage]?.altText || product.title}
+                src={images[selectedImage]?.url || "/placeholder.svg"}
+                alt={product.name}
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder.svg";
+                }}
                 className="w-full h-full object-cover"
               />
             </div>
 
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
-                {images.slice(0, 4).map((image, index) => (
+                {images.slice(0, 4).map((image: ProductImage, index: number) => (
                   <button
                     key={index}
                     type="button"
@@ -116,7 +119,7 @@ export function ProductPageClient() {
                   >
                     <img
                       src={image.url || "/placeholder.svg"}
-                      alt={image.altText || `${product.title} ${index + 1}`}
+                      alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -130,14 +133,15 @@ export function ProductPageClient() {
             <div>
               {hasDiscount && <Badge className="bg-black text-white mb-4">{discount}% OFF</Badge>}
 
-              <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">{product.title}</h1>
+              {/* Fixed: product.title -> product.name */}
+              <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">{product.name}</h1>
 
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl font-bold text-black">${price.toFixed(2)}</span>
                 {hasDiscount && (
                   <>
                     <span className="text-xl text-gray-500 line-through">
-                      ${Number.parseFloat(compareAtPrice).toFixed(2)}
+                      ${compareAtPrice?.toFixed(2)}
                     </span>
                     <Badge variant="secondary" className="bg-gray-100 text-black">
                       {discount}% OFF
@@ -154,8 +158,8 @@ export function ProductPageClient() {
             </div>
 
             {/* Quantity and Add to Cart Form */}
-            <form onSubmit={handleAddToCart} className="space-y-4">
-              <div className="flex items-center gap-4">
+            <form onSubmit={handleAddToCart}>
+              <div className="flex items-center gap-4 mb-6">
                 <span className="font-medium">Quantity:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button
@@ -176,13 +180,13 @@ export function ProductPageClient() {
                     +
                   </button>
                 </div>
-                <span className="text-sm text-gray-500">{variant?.availableForSale ? "In stock" : "Out of stock"}</span>
+                <span className="text-sm text-gray-500">{available ? "In stock" : "Out of stock"}</span>
               </div>
 
               <div className="flex gap-4">
                 <Button
                   type="submit"
-                  disabled={!variant?.availableForSale || isAddingToCart}
+                  disabled={!available || isAddingToCart}
                   className="flex-1 bg-black text-white hover:bg-black/90 text-lg py-6 disabled:opacity-50"
                 >
                   {isAddingToCart ? (
@@ -190,7 +194,7 @@ export function ProductPageClient() {
                   ) : (
                     <ShoppingCart className="w-5 h-5 mr-2" />
                   )}
-                  {variant?.availableForSale ? "Add to Cart" : "Out of Stock"}
+                  {available ? "Add to Cart" : "Out of Stock"}
                 </Button>
               </div>
             </form>
@@ -247,16 +251,17 @@ export function ProductPageClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex justify-between py-2 border-b border-gray-200">
                     <span className="font-medium text-black">Product ID:</span>
-                    <span className="text-gray-600">{product.id.split("/").pop()}</span>
+                    {/* Fixed: Removed .split('/') because Prisma uses plain UUID strings */}
+                    <span className="text-gray-600">{product.id}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-200">
                     <span className="font-medium text-black">Handle:</span>
-                    <span className="text-gray-600">{product.handle}</span>
+                    <span className="text-gray-600">{product.slug}</span>
                   </div>
-                  {variant && (
+                  {available && (
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-medium text-black">Variant:</span>
-                      <span className="text-gray-600">{variant.title}</span>
+                      <span className="text-gray-600">{product.name}</span>
                     </div>
                   )}
                 </div>

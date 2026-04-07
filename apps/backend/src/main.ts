@@ -1,19 +1,26 @@
 require("dotenv").config();
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// import cookieParser from 'cookie-parser';
-// import { FakeAuthMiddleware } from './auth/fake-auth.middleware';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
+import { setupGlobalPrefix } from './common/helpers/global-prefix.helper';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT || 3001; 
   const cookieParser = require('cookie-parser');
 
   // handle cookies
   app.use(cookieParser());
   app.setGlobalPrefix('api');
+
+  //log manual queries
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+  new PrismaClient({ adapter, log: ['query'] });
 
   const config = new DocumentBuilder()
     .setTitle('Marketplace Management Inventory System (ShopStack)')
@@ -46,13 +53,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist:true, forbidNonWhitelisted: true}));
 
-  // app.listen(3001, () => {
-  //   console.log("Server is running at http://localhost:3001")
-  //   console.log("Swagger API is ruuning at http://localhost:3001/api")
-  // })
+  setupGlobalPrefix(app);
 
-  await app.listen(port, '0.0.0.0'); // Adding '0.0.0.0' is important for Docker/Cloud environments
-  console.log(`Server is running at /api (Render dynamic port: ${port})`);
-  console.log(`Swagger docs at /api-docs`);
+  const port = process.env.PORT || 3001;
+  await app.listen(port, '0.0.0.0');
+  
+  console.log(`Application is running on: ${await app.getUrl()}/api-docs`);
 }
 bootstrap();

@@ -157,7 +157,26 @@ export class ProductService {
         where: whereCondition,
         skip,
         take: Number(limit),
-        include: { category: true },
+        include: { 
+          category: {
+            select: {
+              id: true,
+              name: true,
+              is_active: true,
+            }
+          }, 
+          images: {
+            select: {
+              url: true,
+              productId: true,
+            }
+          }, 
+          inventory: {
+            select: {
+              quantity: true,
+              productId: true,
+            }
+          } },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.product.count({ where: whereCondition }),
@@ -178,6 +197,28 @@ export class ProductService {
       where: { id },
       include: { category: true },
     });
+  }
+
+  async findOneBySlug(slug: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        compareAtPrice: true,
+        slug: true,
+        images: { select: { url: true } },
+        inventory: { select: { quantity: true } },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
   }
 
   async update(id: string, data: UpdateProductDto) {

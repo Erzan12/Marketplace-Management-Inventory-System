@@ -91,7 +91,7 @@ async function main() {
   const templates = {
     electronics: ['Headphones', 'Keyboard', 'Mouse', 'Speaker', 'Smart Watch'],
     fashion: ['Backpack', 'Shoes', 'Hoodie', 'Jacket', 'Shorts'],
-    lifestyle: ['Candle', 'Bottle', 'Diffuser', 'Yoga Mat', 'Mug'],
+    lifestyle: ['Candle', 'Perfume', 'Diffuser', 'Yoga Mat', 'Mug'],
     accessories: ['Wallet', 'Sunglasses', 'Belt', 'Watch'],
   };
 
@@ -103,28 +103,28 @@ async function main() {
   const products: any[] = [];
 
   const imageMap: Record<string, string> = {
-    Headphones: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
-    Keyboard: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
-    Mouse: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3',
-    Speaker: 'https://images.unsplash.com/photo-1545454675-3531b543be5d',
-    'Smart Watch': 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b',
+    Headphones: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=1165&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Keyboard: 'https://images.unsplash.com/photo-1637243218672-d338945efdf7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Mouse: 'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Speaker: 'https://plus.unsplash.com/premium_photo-1683141496040-eeef9702269f?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'Smart Watch': 'https://images.unsplash.com/photo-1660844817855-3ecc7ef21f12?q=80&w=786&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 
-    Backpack: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62',
-    Shoes: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-    Hoodie: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7',
-    Jacket: 'https://images.unsplash.com/photo-1520975922203-b1d7c2c9c4bb',
-    Shorts: 'https://images.unsplash.com/photo-1593032465171-8f0c6cfa3c0f',
+    Backpack: 'https://images.unsplash.com/photo-1551974222-1d49f576a2a4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Shoes: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Hoodie: 'https://images.unsplash.com/photo-1564557287817-3785e38ec1f5?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Jacket: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Shorts: 'https://images.unsplash.com/photo-1598522325074-042db73aa4e6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 
-    Candle: 'https://images.unsplash.com/photo-1603006905003-be475563bc59',
-    Bottle: 'https://images.unsplash.com/photo-1524593119773-3f8c7b0e4a47',
-    Diffuser: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb',
-    'Yoga Mat': 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e',
-    Mug: 'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a',
+    Candle: 'https://plus.unsplash.com/premium_photo-1669824023993-273720598b14?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Perfume: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Diffuser: 'https://images.unsplash.com/photo-1635575066917-e788c2bd06b7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'Yoga Mat': 'https://images.unsplash.com/photo-1641913640860-ab4c2bfb2bb0?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Mug: 'https://images.unsplash.com/photo-1727803633591-011b7ca44591?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 
-    Wallet: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc',
-    Sunglasses: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083',
-    Belt: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7',
-    Watch: 'https://images.unsplash.com/photo-1511385348-a52b4a160dc2',
+    Wallet: 'https://images.unsplash.com/photo-1614330315526-166f2d71e544?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Sunglasses: 'https://plus.unsplash.com/premium_photo-1673757119677-6445b73a405e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Belt: 'https://images.unsplash.com/photo-1666723043169-22e29545675c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    Watch: 'https://images.unsplash.com/photo-1506193095-80bc749473f2?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   };
 
   (Object.entries(templates) as [CategoryKey, string[]][]).forEach(([key, items]) => {
@@ -173,7 +173,7 @@ async function main() {
       price: 199.99,
       images: {
         create: [
-          {url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'},
+          {url: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=1165&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'},
         ]
       },
       categoryId: categoryMap.electronics.id,
@@ -191,7 +191,7 @@ async function main() {
       price: 89.99,
       images: {
         create: [
-          {url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62'},
+          {url: 'https://images.unsplash.com/photo-1551974222-1d49f576a2a4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'},
         ]
       },
       categoryId: categoryMap.fashion.id,

@@ -1,45 +1,47 @@
-import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException } from '@nestjs/common';
+import { Controller, Delete, Post, Get, Patch, Request, Param, Body, Req, BadRequestException, ParseUUIDPipe } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
+import { AddCartDto, UpdateCartDto } from './dto/cart.dto';
+import { RequestUser } from '../../shared/types/request-user.interface';
+import { SessionUser } from '../../shared/types/session-user.decorator';
 
-@Controller('orders')
+@Controller('cart') // Change this from 'orders'
 export class CartController {
-    constructor ( private readonly cartService: CartService) {}
+    constructor(private readonly cartService: CartService) {}
 
-    @Post('/cart')
-    async addToCart(
-        @Request() req, 
-        @Body() body: { productId: string; quantity: number }
+    @Post() // Logic: POST /cart
+    addToCart(
+        @SessionUser() user: RequestUser,
+        @Body() dto: AddCartDto,
     ) {
-        const userId = req.user?.userId;
-
-        if (!userId || !body.productId) {
-            throw new BadRequestException('Missing userId or productId');
-        }
-        return this.cartService.addToCart(userId, body.productId, body.quantity);
+        return this.cartService.addToCart(user, dto);
     }
 
-    @Get('/my-cart')
+    @Get() // Logic: GET /cart
     viewCart(@Request() req) {
-        const userId = req.user.userId;
-        return this.cartService.viewCart(userId);
+        return this.cartService.viewCart(req.user.userId);
     }
 
-    @Patch()
-    updateQuantity(
-        @Req() req,
-        @Body('productId') productId: string,
-        @Body('quantity') quantity: number,
+    @Patch('/:productId')
+    updateCart(
+        @SessionUser() user: RequestUser,
+        @Body() dto: UpdateCartDto,
+        @Param('productId', new ParseUUIDPipe()) productId: string,
     ) {
-        const userId = req.user.userId; // pulled from JWT (ensure auth middleware is used)
-        return this.cartService.updateQuantity(userId, productId, quantity);
+        return this.cartService.updateQuantity(user, dto, productId);
+    }
+
+    // Use Param for Delete to match common REST patterns
+    @Delete('/:productId') // Logic: DELETE /cart/:productId
+    removeFromCart(
+        @SessionUser() user: RequestUser,
+        @Param('productId', new ParseUUIDPipe()) productId: string) {
+        return this.cartService.removeFromCart(user, productId);
     }
 
     @Delete()
-    removeFromCart(
-        @Req() req, 
-        @Body('productId') productId: string
+    clearCart(
+        @SessionUser() user: RequestUser,
     ) {
-        const userId = req.user.userId;
-        return this.cartService.removeFromCart(userId, productId);
+        return this.cartService.clearCart(user);
     }
 }

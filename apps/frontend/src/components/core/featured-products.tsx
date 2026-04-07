@@ -11,37 +11,51 @@ import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 // Replace the shopify hook with your new NestJS hook
 import { useProducts } from "@/hooks/useProducts" 
+import { useProduct } from "@/hooks/useProduct"
+import { useParams } from "next/navigation"
 
 export function FeaturedProducts() {
   // Fetching from NestJS (limiting to 6 for the featured section)
   const { data: apiResponse, isLoading, error } = useProducts()
   const { addItem } = useCart()
-  
+
   // Track which products are being added to show individual loading states
   const [addingProducts, setAddingProducts] = useState<Set<number>>(new Set())
 
-  const handleAddToCart = async (product: any, event: React.MouseEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
+  const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    setAddingProducts((prev) => new Set(prev).add(product.id))
+    // 1. Loading state for this specific product
+    setAddingProducts((prev) => new Set(prev).add(productData.id));
 
     try {
+      // 2. Call the context addItem
+      // Ensure 'id' here is the actual Product UUID from your DB
       await addItem({
-        id: product.id.toString(), // Cart context likely expects a string
-        name: product.name,
-        price: product.price,
-        image: product.images?.[0] || "/placeholder.svg",
-        handle: product.slug,
-      })
+        id: productData.id, 
+        name: productData.title || productData.name,
+        price: Number(productData.price),
+        image: productData.image,
+        quantity: 1,
+        handle: productData.handle || productData.slug,
+      });
+
+      // Optional: Add a toast notification here if you have one
+      // toast.success(`${productData.title} added to cart!`);
+
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      // toast.error("Could not add item to cart. Please try again.");
     } finally {
+      // 3. Remove loading state
       setAddingProducts((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(product.id)
-        return newSet
-      })
+        const newSet = new Set(prev);
+        newSet.delete(productData.id);
+        return newSet;
+      });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -79,17 +93,16 @@ export function FeaturedProducts() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => {
-            const isAddingThisProduct = addingProducts.has(product.id)
-            
-            // Map your NestJS data to the UI structure
+            const isAddingThisProduct = addingProducts.has(product.id)  
+            // Map NestJS data to the UI structure
             const productData = {
               id: product.id,
               title: product.name,
               price: product.price,
-              image: product.images?.[0] || "/placeholder.svg",
+              image: product.images?.[0]?.url || "/placeholder.svg",
               handle: product.slug,
-              available: product.quantity > 0,
-              category: product.category?.name
+              available: (product.inventory?.quantity ?? 0) > 0,
+              category: product.category?.name,
             }
 
             return (
@@ -97,9 +110,9 @@ export function FeaturedProducts() {
                 <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 h-full flex flex-col relative">
                   <CardContent className="p-0 flex flex-col h-full">
                     <div className="relative overflow-hidden">
-                      <Link href={`/product/${productData.handle}`}>
+                      <Link href={`/products/${productData.handle}`}>
                         <img
-                          src={productData.image}
+                          src={productData.image || "/placeholder.svg"}
                           alt={productData.title}
                           className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                         />
@@ -109,7 +122,7 @@ export function FeaturedProducts() {
                         <Button
                           type="button"
                           className="bg-white text-black hover:bg-gray-100 border border-gray-200"
-                          onClick={(e) => handleAddToCart(product, e)}
+                          onClick={(e) => handleAddToCart(productData, e)}
                           disabled={!productData.available || isAddingThisProduct}
                         >
                           {isAddingThisProduct ? (
@@ -123,7 +136,7 @@ export function FeaturedProducts() {
                     </div>
 
                     <div className="p-6 flex flex-col flex-grow">
-                      <Link href={`/product/${productData.handle}`}>
+                      <Link href={`/products/${productData.handle}`}>
                         <h3 className="font-semibold text-lg text-black mb-1 group-hover:text-gray-600 transition-colors cursor-pointer line-clamp-2 h-14 leading-7">
                           {productData.title}
                         </h3>
@@ -140,14 +153,15 @@ export function FeaturedProducts() {
                         <Button
                           type="button"
                           className="w-full bg-black text-white hover:bg-black/90"
-                          onClick={(e) => handleAddToCart(product, e)}
+                          onClick={(e) => handleAddToCart(productData, e)}
                           disabled={!productData.available || isAddingThisProduct}
                         >
                           {isAddingThisProduct ? (
                             <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          ) : (
-                            "Add to Cart"
+                          ) :  (
+                            <ShoppingCart className="w-4 h-4 mr-2" />
                           )}
+                          {productData.available ? "Add to Cart" : "Out of Stock"}
                         </Button>
                       </div>
                     </div>

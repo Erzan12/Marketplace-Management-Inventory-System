@@ -10,16 +10,16 @@ export interface ProductResponse {
   };
 }
 
-export function useProducts(params?: { category?: string; search?: string; page?: number; }) {
-  return useQuery({
+export function useProducts(params?: {
+  category?: string;
+  search?: string;
+  page?: number;
+}) {
+  return useQuery<ProductResponse>({
     queryKey: ['products', params],
     queryFn: async () => {
       const { data } = await apiClient.get<ProductResponse>('/products', {
-        params: {
-          category: params?.category,
-          search: params?.search,
-          page: params?.page,
-        },
+        params,
       });
       return data;
     },

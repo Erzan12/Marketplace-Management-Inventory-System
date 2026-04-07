@@ -72,6 +72,7 @@ export const authApi = {
 export const productsApi = {
   getAll: () => apiClient.get('/products'),
   getById: (id: number) => apiClient.get(`/products/${id}`),
+  getBySlug: (slug: string) => apiClient.get(`/products/slug/${slug}`),
   create: (data: { name: string; description?: string; price: number; quantity: number; categoryId?: number }) =>
     apiClient.post('/products', data),
   update: (id: number, data: Partial<{ name: string; description: string; price: number; quantity: number; categoryId: number }>) =>
@@ -79,16 +80,46 @@ export const productsApi = {
   delete: (id: number) => apiClient.delete(`/products/${id}`),
 };
 
-// Cart API helpers
 export const cartApi = {
-  getCart: () => apiClient.get('api/orders/my-cart'),
-  addToCart: (productId: number, quantity: number) =>
-    apiClient.post('/orders/my-cart', { productId, quantity }),
-  updateCartItem: (productId: number, quantity: number) =>
-    apiClient.patch('/orders/my-cart', { productId, quantity }),
-  removeFromCart: (productId: number) =>
-    apiClient.delete(`/orders/my-cart/${productId}`),
-  clearCart: () => apiClient.delete('/orders/my-cart'),
+  // GET /cart
+  getCart: () => apiClient.get('/cart'),
+  
+  // POST /cart
+  addToCart: (productId: string, quantity: number) =>
+    apiClient.post('/cart', { productId, quantity }),
+    
+  // PATCH /cart
+  updateCartItem: (productId: string, quantity: number) =>
+    apiClient.patch(`/cart/${productId}`, { quantity }),
+    
+  // DELETE /cart/:id
+  removeFromCart: (productId: string) =>
+    apiClient.delete(`/cart/${productId}`),
+
+  // Clear cart product
+  clearCart: () => apiClient.delete('/cart'),
+};
+
+export const categoryApi = {
+  // GET /categories
+  getAll: () => apiClient.get('/categories'),
+
+  // GET /categories/:id
+  getById: (id: string) => apiClient.get(`/categories/${id}`),
+
+  // POST /categories -> admin only
+  create: (data: { name: string; slug: string }) => apiClient.post('/categories', data),
+
+  // PATCH /categories/:id -> admin only
+  update: (id: string, data: { name: string; slug: string }) => apiClient.patch(`/categories/${id}`, data),
+
+  // DELETE /categories/:id -> admin only
+  delete: (id: string) => apiClient.delete(`/categories/${id}`),
+};
+
+export const storeApi = {
+  getMyStore: () => apiClient.get('/stores/my-store'), // Create this endpoint in NestJS
+  createStore: (data: { name: string; slug: string }) => apiClient.post('/stores', data),
 };
 
 export default apiClient;

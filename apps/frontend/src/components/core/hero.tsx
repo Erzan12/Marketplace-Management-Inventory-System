@@ -4,24 +4,26 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Star } from "lucide-react"
 import { getStoreName } from "@/lib/shopify/store-name"
-// import { useProducts } from "@/hooks/shopify/use-shopify"
 import { useMemo } from "react"
 import Link from "next/link"
 import { useProducts } from "@/hooks/useProducts"
+import { useQuery } from "@tanstack/react-query"
+import { storeApi } from "@/lib/api-client"
 
 export function Hero() {
   // Get dynamic store name for the hero title
   const storeName = getStoreName()
-  // const { products, loading } = useProducts()
   const { data: apiResponse, isLoading, error } = useProducts({
-      // search: debouncedSearch,
-      // category: selectedCollection || undefined,
-      // page: currentPage, // This sends ?page=X to your NestJS API
     })
-  
 
-  // Check if Shopify is configured
-  const isShopifyConfigured = !!process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
+  // Inside your Hero or a parent Layout
+  const { data: userStore, isLoading: loadingStore } = useQuery({
+    queryKey: ['my-store'],
+    queryFn: () => storeApi.getMyStore().then(res => res.data),
+    retry: false // Don't retry if 404 (user isn't a seller yet)
+  });
+
+  const isSeller = !!userStore; // This replaces isShopifyConfigured
 
   const products = apiResponse?.data || []
 
@@ -32,33 +34,28 @@ export function Hero() {
     return products[randomIndex]
   }, [products])
 
-  // Get product details
   const productDetails = useMemo(() => {
     if (!featuredProduct) return null
 
-    // 1. Data Mapping for your custom DB (NestJS)
-    // Based on your JSON: { id, name, price, images: [url], slug, quantity }
     const title = featuredProduct.name
-    const price = featuredProduct.price
-    const image = featuredProduct.images?.[0] // Usually a string array in your DB
-    const handle = featuredProduct.slug
-    const available = featuredProduct.quantity > 0
-
-    // 2. Logic for Discount (If your DB has a compareAtPrice field)
-    // If you haven't added compareAtPrice to your NestJS schema yet, 
-    // hasDiscount will just be false.
-    const compareAtPrice = featuredProduct.compareAtPrice || null 
+    const price = Number(featuredProduct.price)
+    const compareAtPrice = featuredProduct.compareAtPrice ? Number(featuredProduct.compareAtPrice) : null
+    
+    // Sale logic: if compareAtPrice exists and is higher than current price
     const hasDiscount = !!(compareAtPrice && compareAtPrice > price)
+    
+    // Get primary image or first available
+    const primaryImage = featuredProduct.images?.find((img: any) => img.isPrimary) || featuredProduct.images?.[0]
 
     return {
       title,
       price,
       compareAtPrice,
       hasDiscount,
-      image: image || "/placeholder.svg?height=400&width=400",
-      imageAlt: title,
-      handle,
-      available,
+      image: primaryImage?.url || "/placeholder.svg?height=400&width=400",
+      imageAlt: primaryImage?.altText || title,
+      handle: featuredProduct.slug,
+      available: (featuredProduct.inventory?.quantity ?? 0) > 0,
     }
   }, [featuredProduct])
 
@@ -73,7 +70,9 @@ export function Hero() {
               {/* Simplified badge */}
               <Badge variant="outline" className="border-black text-black bg-transparent px-4 py-2 w-fit">
                 <Star className="w-4 h-4 mr-2 fill-black" />
-                {isShopifyConfigured ? "New Collection Available" : "Demo Store"}
+                {/* {isShopifyConfigured ? "New Collection Available" : "Demo Store"} */}
+                {/* {isSeller ? "New Collection Available" : "Connecting to Inventory..."} */}
+                {products.length > 0 ? "New Collection Available" : "Connecting to Inventory..."}
               </Badge>
 
               {/* Dynamic hero title */}
@@ -93,9 +92,9 @@ export function Hero() {
                 </h1>
 
                 <p className="text-xl text-black/70 mb-8 max-w-lg leading-relaxed">
-                  {isShopifyConfigured
+                  {isSeller
                     ? "Discover amazing products that blend style, innovation, and quality."
-                    : "This is a demo storefront. Connect your Shopify store to see real products."}
+                    : "This is a demo storefront. Create your own store to feature new products."}
                 </p>
               </div>
 
@@ -133,10 +132,13 @@ export function Hero() {
               ) : productDetails ? (
                 // Real product showcase
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <Link href={`/product/${productDetails.handle}`}>
+                  <Link href={`/products/${productDetails.handle}`}>
                     <img
-                      src={productDetails.image || "/placeholder.svg"}
+                      src={productDetails.image}
                       alt={productDetails.imageAlt}
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
                       className="w-full h-80 object-cover rounded-lg mb-4 cursor-pointer hover:opacity-90 transition-opacity duration-300"
                     />
                   </Link>
@@ -144,7 +146,7 @@ export function Hero() {
                   {/* Product info */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Link href={`/product/${productDetails.handle}`}>
+                      <Link href={`/products/${productDetails.handle}`}>
                         <h3 className="font-semibold text-lg text-black hover:text-gray-600 transition-colors cursor-pointer line-clamp-1">
                           {productDetails.title}
                         </h3>
@@ -172,7 +174,7 @@ export function Hero() {
               ) : (
                 // Placeholder product showcase
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 relative">
-                  {!isShopifyConfigured && (
+                  {!isSeller && (
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
                         Demo
@@ -215,7 +217,7 @@ export function Hero() {
                 <p className="text-gray-600 text-sm">Happy Customers</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-black">{isShopifyConfigured ? `${products.length}+` : "50+"}</p>
+                <p className="text-2xl font-bold text-black">{isSeller ? `${products.length}+` : "50+"}</p>
                 <p className="text-gray-600 text-sm">Products</p>
               </div>
               <div>

@@ -10,8 +10,6 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 enum ProductStatus {
@@ -100,10 +98,11 @@ model Product {
   description String?
   price       Decimal @db.Decimal(10, 2)
   categoryId  String?  @db.Uuid
-  slug        String
+  slug        String  @unique
   storeId     String  @db.Uuid
   is_active   Boolean @default(true)
   status      ProductStatus  @default(DRAFT) // ACTIVE, DRAFT, ARCHIVED
+  compareAtPrice Decimal? @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
