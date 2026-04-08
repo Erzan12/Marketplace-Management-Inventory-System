@@ -13,7 +13,6 @@ async function bootstrap() {
 
   // handle cookies
   app.use(cookieParser());
-  app.setGlobalPrefix('api');
 
   //log manual queries
   const adapter = new PrismaPg({
@@ -41,7 +40,7 @@ async function bootstrap() {
   const documentFactory =  () => SwaggerModule.createDocument(app, config);
 
   //Move Swagger to /api-docs so it doesn't fight with the /api prefix
-  SwaggerModule.setup('api-docs', app, documentFactory);
+  SwaggerModule.setup('', app, documentFactory);
 
   // Enable CORS for frontend on ports 3000 and 3001
   app.enableCors({
