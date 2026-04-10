@@ -1,5 +1,6 @@
 [build]
-  command = "npx turbo run build --filter=frontend"
+  base = "apps/frontend"
+  command = "npm run build"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
