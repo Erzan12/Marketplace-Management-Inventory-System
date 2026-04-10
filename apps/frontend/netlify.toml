@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npx turbo run build --filter=frontend"
   publish = ".netlify"
 
 [[plugins]]
