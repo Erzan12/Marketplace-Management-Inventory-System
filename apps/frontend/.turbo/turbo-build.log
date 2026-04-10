@@ -8,3 +8,40 @@
    Creating an optimized production build ...
  ✓ Compiled successfully
    Linting and checking validity of types ...
+
+./src/components/core/hero.tsx
+44:9  Warning: The 'products' logical expression could make the dependencies of useMemo Hook (at line 51) change on every render. To fix this, wrap the initialization of 'products' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./src/contexts/cart-context.tsx
+207:6  Warning: React Hook useEffect has a missing dependency: 'API_URL'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/12) ...
+   Generating static pages (3/12) 
+   Generating static pages (6/12) 
+   Generating static pages (9/12) 
+ ✓ Generating static pages (12/12)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    6.14 kB         163 kB
+├ ○ /_not-found                          981 B           106 kB
+├ ○ /admin                               2.4 kB          118 kB
+├ ○ /admin/categories                    3.39 kB         139 kB
+├ ○ /cart                                1.55 kB         140 kB
+├ ○ /login                               3.34 kB         153 kB
+├ ○ /products                            3.34 kB         163 kB
+├ ƒ /products/[slug]                     2.77 kB         162 kB
+├ ○ /seller/products/new                 3.41 kB         143 kB
+└ ○ /sign-up                             3.18 kB         152 kB
++ First Load JS shared by all            105 kB
+  ├ chunks/855-bda199cbbcb4b585.js       50.5 kB
+  ├ chunks/87c73c54-9385d144057616af.js  52.9 kB
+  └ other shared chunks (total)          1.99 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
