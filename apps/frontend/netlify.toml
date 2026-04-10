@@ -1,6 +1,6 @@
 [build]
   base = "apps/frontend"
-  command = "turbo run build --filter frontend"
+  command = "npm run build"
   publish = "apps/frontend/.next"
 
 [[plugins]]
