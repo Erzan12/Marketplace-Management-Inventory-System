@@ -1,0 +1,7 @@
+[build]
+  base = "apps/frontend"
+  command = "turbo run build --filter frontend"
+  publish = "apps/frontend/.next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
