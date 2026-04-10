@@ -1,5 +1,5 @@
 {
-  "name": "product-inventory-api",
+  "name": "backend",
   "version": "1.5.0",
   "description": "",
   "author": "",
@@ -7,8 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "nest start --watch",
-    "build": "nest build",
-    "start": "node dist/main.js",
+    "build": "prisma generate && nest build",
+    "start": "nest start",
     "start:prod": "node dist/main.js",
     "lint": "nest lint",
     "test": "nest test"
