@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Erzan12/Product-Inventory-System#readme",
   "devDependencies": {
-    "turbo": "^2.8.20"
+    "turbo": "^2.9.6"
   },
   "private": true,
   "packageManager": "npm@10.5.0",
@@ -30,6 +30,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.15.9",
     "framer-motion": "^12.38.0"
   }
 }
