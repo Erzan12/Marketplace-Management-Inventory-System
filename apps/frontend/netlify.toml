@@ -1,7 +1,10 @@
 [build]
-  base = "apps/frontend"
-  command = "npm run build"
-  publish = ".next"
+  command = "npx turbo build --filter=frontend"
+  publish = "apps/frontend/.next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_USE_NETLIFY_EDGE = "true" # Optional: improves performance on Netlify
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
