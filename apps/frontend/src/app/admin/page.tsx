@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from "lucide-react"
+import { DollarSign, Package, ShoppingCart, Users } from "lucide-react"
 
 export default function Dashboard() {
   return (
@@ -10,7 +10,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-4xl font-bold text-black mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Welcome back. Here is an overview of your store's performance.</p>
+        <p className="text-gray-600">Welcome back. Here is an overview of your store&apos;s performance.</p>
       </div>
 
       {/* Bento Grid Stats Card */}

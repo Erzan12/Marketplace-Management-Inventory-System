@@ -15,6 +15,7 @@ import { useCart } from "@/contexts/cart-context"
 // Updated to use the custom hook for products
 import { useProducts } from "@/hooks/useProducts"
 import { useDebounce } from "@/hooks/useDebounce" // Recommended for search input
+import Image from "next/image"
 
 export function ProductsPageClient() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -50,9 +51,17 @@ export function ProductsPageClient() {
     }
   }, [])
 
- 
-  
-  const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
+  const handleAddToCart = async (
+    productData: {
+      id: string
+      title: string
+      price: number | string
+      image: string
+      handle: string
+      available: boolean
+    },
+    event: React.MouseEvent
+  ) => {
     event.preventDefault()
     event.stopPropagation()
 
@@ -180,6 +189,10 @@ export function ProductsPageClient() {
               category: product.category?.name,
             }
 
+            const hasDiscount =
+              product.compareAtPrice != null &&
+              Number(product.compareAtPrice) > Number(product.price)
+
               return (
                 <div key={productData.id} className="h-full">
                   <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 h-full flex flex-col relative">
@@ -187,7 +200,7 @@ export function ProductsPageClient() {
                       <div className="relative overflow-hidden">
                         {/* <Link href={isAddingThisProduct ? `/product/${productData.handle}` : "#"}> */}
                         <Link href={`/products/${productData.handle}`}>
-                          <img
+                          <Image
                             src={productData.image}
                             alt={productData.title}
                             onError={(e) => {
@@ -197,7 +210,7 @@ export function ProductsPageClient() {
                           />
                         </Link>
 
-                        {product.hasDiscount && (
+                        {hasDiscount && product.compareAtPrice && (
                           <Badge className="absolute top-4 left-4 bg-black text-white">Sale</Badge>
                         )}
 

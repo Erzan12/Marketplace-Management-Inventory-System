@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Lock, Mail, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import { AxiosError } from 'axios';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -66,18 +67,23 @@ export default function LoginPage() {
     try {
       // Hit the login endpoint
       // apiClient already has withCredentials: true from our previous step!
-      const response = await apiClient.post('/auth/login', formData);
+      await apiClient.post('/auth/login', formData);
 
       // Use the login function here, but DO NOT call useAuth() here.
-      login(formData.email);
+      login(formData.email, formData.password);
       router.push('/');
-      
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      // Use the error structure from your Axios interceptor
-      setErrorMessage(error.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
+
+      if (error instanceof AxiosError) {
+        setErrorMessage(
+          error.response?.data?.message || 'Login failed. Please check your credentials.'
+        );
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Something went wrong.');
+      }
     }
   };
 
@@ -175,7 +181,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <a
                 href="/sign-up"
                 className="text-primary hover:underline font-medium"

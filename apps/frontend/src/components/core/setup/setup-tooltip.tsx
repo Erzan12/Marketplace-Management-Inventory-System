@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, Store, ExternalLink, ArrowRight, Settings, Copy, Check } from "lucide-react"
 import { useState } from "react"
-import { parseShopifyDomain } from "@/lib/shopify/parse-shopify-domain"
+// import { parseShopifyDomain } from "@/lib/shopify/parse-shopify-domain"
 
 export function SetupTooltip() {
   const [isOpen, setIsOpen] = useState(true)
@@ -12,7 +12,7 @@ export function SetupTooltip() {
     "welcome",
   )
   const [storeUrl, setStoreUrl] = useState("")
-  const [parsedDomain, setParsedDomain] = useState<string | null>(null)
+  // const [parsedDomain, setParsedDomain] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = (text: string) => {
@@ -24,8 +24,8 @@ export function SetupTooltip() {
   // Handle input change and parse domain in real-time
   const handleStoreUrlChange = (value: string) => {
     setStoreUrl(value)
-    const parsed = parseShopifyDomain(value)
-    setParsedDomain(parsed)
+    // const parsed = parseShopifyDomain(value)
+    // setParsedDomain(parsed)
   }
 
   if (!isOpen) {
@@ -115,7 +115,7 @@ export function SetupTooltip() {
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-xs text-yellow-800">
-                  <strong>Don't worry about the format!</strong> Our system will automatically detect and convert any of
+                  <strong>Don&apos;t worry about the format!</strong> Our system will automatically detect and convert any of
                   these formats to work correctly.
                 </p>
               </div>
@@ -236,7 +236,7 @@ export function SetupTooltip() {
               </div>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-xs text-yellow-800">
-                  <strong>After creating your store:</strong> Come back here and click "I have a Shopify store" to get
+                  <strong>After creating your store:</strong> Come back here and click &quot;I have a Shopify store&quot; to get
                   setup instructions.
                 </p>
               </div>

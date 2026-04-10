@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Lock, Mail, User, Loader2, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, Loader2, ArrowLeft } from 'lucide-react';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

@@ -7,12 +7,11 @@ import { ShoppingCart, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 // Replace the shopify hook with your new NestJS hook
 import { useProducts } from "@/hooks/useProducts" 
-import { useProduct } from "@/hooks/useProduct"
-import { useParams } from "next/navigation"
+import Image from "next/image"
+import { UIProduct } from "@/types/product"
 
 export function FeaturedProducts() {
   // Fetching from NestJS (limiting to 6 for the featured section)
@@ -20,9 +19,9 @@ export function FeaturedProducts() {
   const { addItem } = useCart()
 
   // Track which products are being added to show individual loading states
-  const [addingProducts, setAddingProducts] = useState<Set<number>>(new Set())
+  const [addingProducts, setAddingProducts] = useState<Set<string>>(new Set())
 
-  const handleAddToCart = async (productData: any, event: React.MouseEvent) => {
+  const handleAddToCart = async (productData: UIProduct, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -34,11 +33,11 @@ export function FeaturedProducts() {
       // Ensure 'id' here is the actual Product UUID from your DB
       await addItem({
         id: productData.id, 
-        name: productData.title || productData.name,
+        name: productData.title,
         price: Number(productData.price),
         image: productData.image,
         quantity: 1,
-        handle: productData.handle || productData.slug,
+        handle: productData.handle,
       });
 
       // Optional: Add a toast notification here if you have one
@@ -95,14 +94,14 @@ export function FeaturedProducts() {
           {products.map((product) => {
             const isAddingThisProduct = addingProducts.has(product.id)  
             // Map NestJS data to the UI structure
-            const productData = {
+            const productData: UIProduct = {
               id: product.id,
               title: product.name,
               price: product.price,
               image: product.images?.[0]?.url || "/placeholder.svg",
               handle: product.slug,
               available: (product.inventory?.quantity ?? 0) > 0,
-              category: product.category?.name,
+              category: product.category?.name
             }
 
             return (
@@ -111,7 +110,7 @@ export function FeaturedProducts() {
                   <CardContent className="p-0 flex flex-col h-full">
                     <div className="relative overflow-hidden">
                       <Link href={`/products/${productData.handle}`}>
-                        <img
+                        <Image
                           src={productData.image || "/placeholder.svg"}
                           alt={productData.title}
                           className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"

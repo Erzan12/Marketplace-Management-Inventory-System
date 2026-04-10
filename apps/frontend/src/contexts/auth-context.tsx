@@ -15,30 +15,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// export function AuthProvider({ children }: { children: ReactNode }) {
-//   const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-//   useEffect(() => {
-//     setIsLoggedIn(!!localStorage.getItem("userEmail"))
-//   }, [])
-
-//   const login = (email: string) => {
-//     localStorage.setItem("userEmail", email)
-//     setIsLoggedIn(true)
-//   }
-
-//   const logout = () => {
-//     localStorage.removeItem("userEmail")
-//     setIsLoggedIn(false)
-//   }
-
-//   return (
-//     <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
-//       {children}
-//     </AuthContext.Provider>
-//   )
-// }
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<User | null>(null)
@@ -47,13 +23,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedEmail = localStorage.getItem("userEmail")
     const storedRole = localStorage.getItem("userRole")
 
+    console.log("Auth init:")
+    console.log("storedEmail:", storedEmail)
+    console.log("storedRole:", storedRole)
+
+    if (!storedEmail) {
+      console.warn("No email found in localStorage")
+    }
+
+    if (!storedRole) {
+      console.warn("No role found in localStorage")
+    }
+
+    if (storedEmail && storedRole) {
+      setUser({ email: storedEmail, role: storedRole })
+      setIsLoggedIn(true)
+    }
+
     if (storedEmail && storedRole) {
       setUser({ email: storedEmail, role: storedRole })
       setIsLoggedIn(true)
     }
   }, [])
 
+  // const login = (email: string, role: string) => {
+  //   localStorage.setItem("userEmail", email)
+  //   localStorage.setItem("userRole", role)
+
+  //   setUser({ email, role })
+  //   setIsLoggedIn(true)
+  // }
+
   const login = (email: string, role: string) => {
+    console.log("ROLE BEFORE LOGIN:", role)
+    if (!role || role === "undefined") {
+      console.error("❌ Invalid role passed to login:", role)
+      return
+    }
+
     localStorage.setItem("userEmail", email)
     localStorage.setItem("userRole", role)
 

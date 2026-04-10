@@ -18,7 +18,7 @@ export function Navbar() {
 
   // Handle logout
   const { isLoggedIn, logout, user } = useAuth();
-  const [showDropdown, setShowDropdown] = useState(false);
+  // const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
 
@@ -29,7 +29,7 @@ export function Navbar() {
       
       // Clear local data
       logout();
-      setShowDropdown(false);
+      // setShowDropdown(false);
       
       // Redirect
       router.push("/login");
@@ -58,19 +58,19 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo - now uses dynamic store name */}
           <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold text-black hover:text-gray-700 transition-colors">
+            <Link href="/" className="text-2xl font-bold text-black hover:text-gray-700 transition-colors">
               {storeName}
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/" className="text-black hover:text-black/70 font-medium transition-colors">
+            <Link href="/" className="text-black hover:text-black/70 font-medium transition-colors">
               Home
-            </a>
-            <a href="/products" className="text-black hover:text-black/70 font-medium transition-colors">
+            </Link>
+            <Link href="/products" className="text-black hover:text-black/70 font-medium transition-colors">
               Products
-            </a>
+            </Link>
             {/* Updated Categories link to scroll to section */}
             <button
               onClick={scrollToCategories}
@@ -161,20 +161,20 @@ export function Navbar() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input type="search" placeholder="Search products..." className="pl-10 pr-4 py-2 w-full" />
               </div>
-              <a
+              <Link
                 href="/"
                 className="text-black hover:text-black/70 font-medium py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/products"
                 className="text-black hover:text-black/70 font-medium py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Products
-              </a>
+              </Link>
               {/* Updated mobile Categories link */}
               <button
                 onClick={scrollToCategories}
