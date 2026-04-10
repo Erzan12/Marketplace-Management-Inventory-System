@@ -15,6 +15,7 @@ export default function Home() {
       <FeaturedProducts />
       <Newsletter />
       <Footer />
+      console.log(&quot;deploy fix&quot;)
     </main>
   )
 }
