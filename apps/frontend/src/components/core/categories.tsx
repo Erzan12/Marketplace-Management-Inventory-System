@@ -1,12 +1,10 @@
 "use client"
 
 import { Shirt, Watch, Headphones, Gamepad2, Camera, Coffee, Package, Star } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { useCollections } from "@/hooks/shopify/use-shopify"
-import { ShopifyCollection } from "@/lib/shopify/shopify"
 import apiClient from "@/lib/api-client"
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
+import { ElementType } from "react"
 
 type Category = {
   id: string
@@ -14,7 +12,7 @@ type Category = {
   title?: string
   slug?: string
   handle?: string
-  icon?: any
+  icon?: ElementType
 }
 
 
@@ -32,13 +30,9 @@ const placeholderCategories: Category[] = [
   { id: "8", title: "Premium", handle: "premium", icon: Star },
 ]
 
-function isShopifyCollection(category: any): category is ShopifyCollection {
-  return 'image' in category
-}
-
 export function Categories() {
   // 1. Fetch from your NestJS API
-  const { data: categories, isLoading } = useQuery<Category[]>({
+  const { data: categories } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: () => apiClient.get('/categories').then(res => res.data)
   })
@@ -64,10 +58,14 @@ export function Categories() {
             // use both in const slug
             const slug = category.slug || category.handle
 
-            const Icon =
-              "icon" in category
-                ? category.icon // from placeholderCategories
-                : defaultIcons[index % defaultIcons.length] // fallback for DB categories
+            // const Icon =
+            //   "icon" in category
+            //     ? category.icon // from placeholderCategories
+            //     : defaultIcons[index % defaultIcons.length] // fallback for DB categories
+
+
+            const Icon: ElementType =
+              category.icon ?? defaultIcons[index % defaultIcons.length]
 
             return (
               <Link

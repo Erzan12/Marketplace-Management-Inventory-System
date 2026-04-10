@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/cart-context"
 import { X, Plus, Minus, ShoppingBag, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 
 export function CartDrawer() {
   const { state, dispatch, removeItem, updateItemQuantity, clearCart } = useCart()
@@ -80,7 +81,7 @@ export function CartDrawer() {
                       key={item.id}
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg"
                     >
-                      <img
+                      <Image
                         src={item.image || "/placeholder.svg"}
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded-md"

@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { Product } from '@/types/product';
+
 
 export interface ProductResponse {
-  data: any[]; // You can define a strict Product interface later based on your Swagger output
+  data: Product[]; // You can define a strict Product interface later based on your Swagger output
   meta: {
     totalItems: number;
     page: number;

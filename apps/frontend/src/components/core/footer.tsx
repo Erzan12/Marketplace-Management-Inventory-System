@@ -1,9 +1,10 @@
 import { Mail, Phone, MapPin } from "lucide-react"
-import { getStoreName } from "@/lib/shopify/store-name"
+// import { getStoreName } from "@/lib/shopify/store-name"
 
 export function Footer() {
   // Get dynamic store name for footer branding
-  const storeName = getStoreName()
+  // const storeName = getStoreName()
+  const storeName = "your store"
 
   return (
     <footer className="bg-white border-t border-gray-200 py-16">

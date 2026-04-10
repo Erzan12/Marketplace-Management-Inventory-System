@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useReducer, useEffect, useCallback } from "react"
 import { useAuth } from "./auth-context"
 import { cartApi } from "@/lib/api-client"
+import { CartApiItem } from "@/types/cart"
 
 export interface CartItem {
   id: string // Product UUID from your Prisma schema
@@ -159,6 +160,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const items = JSON.parse(storedCart)
         dispatch({ type: "LOAD_CART", payload: items })
       } catch (error) {
+        console.error("Failed to parse cart from localStorage", error)
         dispatch({ type: "LOAD_CART", payload: [] })
       }
     } else {
@@ -183,7 +185,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ? responseData
           : responseData.data || []
 
-        const mappedItems: CartItem[] = itemsArray.map((item: any) => ({
+        const mappedItems: CartItem[] = itemsArray.map((item: CartApiItem) => ({
           id: item.product.id,
           name: item.product.name,
           price: Number(item.product.price),

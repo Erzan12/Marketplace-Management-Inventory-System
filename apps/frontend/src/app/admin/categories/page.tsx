@@ -7,11 +7,21 @@ import { useEffect, useState } from "react"
 import { categoryApi } from "@/lib/api-client"
 import { FolderPlus, Loader2, Pencil, Trash2 } from "lucide-react"
 
+interface Product {
+  id: string
+  name: string
+  price: number
+  image: string
+  quantity: number
+  handle: string
+  // add other fields you actually use
+}
+
 interface Category {
   id: string
   name: string
   slug: string
-  products?: any[]
+  products?: Product[]
 }
 
 export default function CategoriesPage() {

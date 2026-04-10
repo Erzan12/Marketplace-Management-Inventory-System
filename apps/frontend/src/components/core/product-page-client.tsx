@@ -9,6 +9,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useProduct, type ProductImage } from "@/hooks/useProduct"
+import Image from "next/image"
 
 export function ProductPageClient() {
   const params = useParams();
@@ -39,7 +40,7 @@ export function ProductPageClient() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-black mb-4">Product Not Found</h1>
-          <p className="text-gray-600 mb-6">This product doesn't exist in the store.</p>
+          <p className="text-gray-600 mb-6">This product doesn&apos;t exist in the store.</p>
           <Link href="/">
             <Button className="bg-black text-white hover:bg-black/90">Return Home</Button>
           </Link>
@@ -96,7 +97,7 @@ export function ProductPageClient() {
           {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
-              <img
+              <Image
                 src={images[selectedImage]?.url || "/placeholder.svg"}
                 alt={product.name}
                 onError={(e) => {
@@ -117,7 +118,7 @@ export function ProductPageClient() {
                       selectedImage === index ? "border-black" : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <img
+                    <Image
                       src={image.url || "/placeholder.svg"}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
