@@ -2,20 +2,13 @@
 > frontend@1.5.0 build
 > next build
 
-   ▲ Next.js 15.1.9
-   - Environments: .env.local
+   ▲ Next.js 15.5.15
+   - Environments: .env.local, .env
 
    Creating an optimized production build ...
- ✓ Compiled successfully
+ ✓ Compiled successfully in 2.6s
    Linting and checking validity of types ...
-
-./src/components/core/hero.tsx
-44:9  Warning: The 'products' logical expression could make the dependencies of useMemo Hook (at line 51) change on every render. To fix this, wrap the initialization of 'products' in its own useMemo() Hook.  react-hooks/exhaustive-deps
-
-./src/contexts/cart-context.tsx
-207:6  Warning: React Hook useEffect has a missing dependency: 'API_URL'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-
-info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ⨯ ESLint: Failed to load plugin 'react-hooks' declared in ' » eslint-config-next/core-web-vitals » D:\Projects\Product-Inventory-System\apps\frontend\node_modules\eslint-config-next\index.js': Cannot find module 'eslint-plugin-react-hooks' Require stack: - D:\Projects\Product-Inventory-System\apps\frontend\__placeholder__.js Referenced from: D:\Projects\Product-Inventory-System\apps\frontend\node_modules\eslint-config-next\index.js
    Collecting page data ...
    Generating static pages (0/12) ...
    Generating static pages (3/12) 
@@ -25,21 +18,21 @@ info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/d
    Finalizing page optimization ...
    Collecting build traces ...
 
-Route (app)                              Size     First Load JS
-┌ ○ /                                    6.14 kB         163 kB
-├ ○ /_not-found                          981 B           106 kB
-├ ○ /admin                               2.4 kB          118 kB
-├ ○ /admin/categories                    3.39 kB         139 kB
-├ ○ /cart                                1.55 kB         140 kB
-├ ○ /login                               3.34 kB         153 kB
-├ ○ /products                            3.34 kB         163 kB
-├ ƒ /products/[slug]                     2.77 kB         162 kB
-├ ○ /seller/products/new                 3.41 kB         143 kB
-└ ○ /sign-up                             3.18 kB         152 kB
-+ First Load JS shared by all            105 kB
-  ├ chunks/855-bda199cbbcb4b585.js       50.5 kB
-  ├ chunks/87c73c54-9385d144057616af.js  52.9 kB
-  └ other shared chunks (total)          1.99 kB
+Route (app)                                 Size  First Load JS
+┌ ○ /                                     6.1 kB         160 kB
+├ ○ /_not-found                            995 B         103 kB
+├ ○ /admin                                2.4 kB         115 kB
+├ ○ /admin/categories                    3.34 kB         136 kB
+├ ○ /cart                                1.51 kB         136 kB
+├ ○ /login                               3.29 kB         150 kB
+├ ○ /products                            3.31 kB         159 kB
+├ ƒ /products/[slug]                     2.73 kB         159 kB
+├ ○ /seller/products/new                 3.38 kB         140 kB
+└ ○ /sign-up                             3.13 kB         149 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/255-71dc57bc2828b9ae.js       45.9 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)             2 kB
 
 
 ○  (Static)   prerendered as static content
