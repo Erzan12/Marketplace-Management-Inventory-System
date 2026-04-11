@@ -7,7 +7,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build --filter=frontend",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "postinstall": "node scripts/ensure-frontend-next.mjs"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "@netlify/plugin-nextjs": "^5.15.9",
     "framer-motion": "^12.38.0"
   }
 }
