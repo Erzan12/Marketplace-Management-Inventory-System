@@ -2,8 +2,8 @@ require("dotenv").config();
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+// import { PrismaPg } from '@prisma/adapter-pg';
+// import { PrismaClient } from '@prisma/client';
 import { setupGlobalPrefix } from './common/helpers/global-prefix.helper';
 import { AppModule } from './app.module';
 
@@ -14,12 +14,12 @@ async function bootstrap() {
   // handle cookies
   app.use(cookieParser());
 
-  //log manual queries
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  });
+  // //log manual queries
+  // const adapter = new PrismaPg({
+  //   connectionString: process.env.DATABASE_URL,
+  // });
 
-  new PrismaClient({ adapter, log: ['query'] });
+  // new PrismaClient({ adapter, log: ['query'] });
 
   const config = new DocumentBuilder()
     .setTitle('Marketplace Management Inventory System (ShopStack)')
@@ -44,8 +44,8 @@ async function bootstrap() {
 
   // Enable CORS for frontend on ports 3000 and 3001
   app.enableCors({
-    origin: ['https://shopstack-commerce.netlify.app'],
-    // origin: true,
+    // origin: ['https://shopstack-commerce.netlify.app'],
+    origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Only needed if you use cookies/auth
   });
@@ -57,6 +57,6 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port, '0.0.0.0');
   
-  console.log(`Application is running on: ${await app.getUrl()}/api-docs`);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
