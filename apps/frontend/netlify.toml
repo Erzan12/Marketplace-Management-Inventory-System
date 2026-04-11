@@ -1,3 +1,8 @@
+[build]
+  base = "apps/frontend"
+  command = "npm run build"
+  publish = ".next"
+
 [build.environment]
   NETLIFY_NEXT_PLUGIN_SKIP = "false"
   NODE_VERSION = "22"
